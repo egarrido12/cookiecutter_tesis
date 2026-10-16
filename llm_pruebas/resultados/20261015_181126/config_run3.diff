@@ -1,0 +1,142 @@
+--- a/cookiecutter/config.py
++++ b/cookiecutter/config.py
+@@ -32,11 +32,22 @@
+     'abbreviations': BUILTIN_ABBREVIATIONS,
+ }
+ 
++# Environment variable that may point to a user configuration file.
++_CONFIG_ENV_VAR = 'COOKIECUTTER_CONFIG'
++
++# Configuration keys holding paths that must have env vars and "~" expanded.
++_PATH_CONFIG_KEYS = ('replay_dir', 'cookiecutters_dir')
++
+ 
+ def _expand_path(path: str) -> str:
+     """Expand both environment variables and user home in the given path."""
+     path = os.path.expandvars(path)
+     return os.path.expanduser(path)
++
++
++def _default_config_copy() -> dict[str, Any]:
++    """Return a shallow copy of the default configuration."""
++    return copy.copy(DEFAULT_CONFIG)
+ 
+ 
+ def merge_configs(default: dict[str, Any], overwrite: dict[str, Any]) -> dict[str, Any]:
+@@ -47,15 +58,43 @@
+     """
+     new_config = copy.deepcopy(default)
+ 
+-    for k, v in overwrite.items():
++    for key, value in overwrite.items():
+         # Make sure to preserve existing items in
+         # nested dicts, for example `abbreviations`
+-        if isinstance(v, dict):
+-            new_config[k] = merge_configs(default.get(k, {}), v)
++        if isinstance(value, dict):
++            new_config[key] = merge_configs(default.get(key, {}), value)
+         else:
+-            new_config[k] = v
++            new_config[key] = value
+ 
+     return new_config
++
++
++def _load_yaml_config(config_path: Path | str) -> dict[str, Any]:
++    """Read the YAML file at ``config_path`` and return its top-level mapping.
++
++    An empty file is interpreted as an empty mapping.
++
++    :raises InvalidConfiguration: If the file is not valid YAML or its
++        top-level element is not a mapping.
++    """
++    with open(config_path, encoding='utf-8') as file_handle:
++        try:
++            yaml_dict = yaml.safe_load(file_handle) or {}
++        except yaml.YAMLError as e:
++            msg = f'Unable to parse YAML file {config_path}.'
++            raise InvalidConfiguration(msg) from e
++
++    if not isinstance(yaml_dict, dict):
++        msg = f'Top-level element of YAML file {config_path} should be an object.'
++        raise InvalidConfiguration(msg)
++
++    return yaml_dict
++
++
++def _expand_config_paths(config_dict: dict[str, Any]) -> None:
++    """Expand env vars and user home in the path entries of ``config_dict``."""
++    for key in _PATH_CONFIG_KEYS:
++        config_dict[key] = _expand_path(config_dict[key])
+ 
+ 
+ def get_config(config_path: Path | str) -> dict[str, Any]:
+@@ -65,23 +104,10 @@
+         raise ConfigDoesNotExistException(msg)
+ 
+     logger.debug('config_path is %s', config_path)
+-    with open(config_path, encoding='utf-8') as file_handle:
+-        try:
+-            yaml_dict = yaml.safe_load(file_handle) or {}
+-        except yaml.YAMLError as e:
+-            msg = f'Unable to parse YAML file {config_path}.'
+-            raise InvalidConfiguration(msg) from e
+-        if not isinstance(yaml_dict, dict):
+-            msg = f'Top-level element of YAML file {config_path} should be an object.'
+-            raise InvalidConfiguration(msg)
++    yaml_dict = _load_yaml_config(config_path)
+ 
+     config_dict = merge_configs(DEFAULT_CONFIG, yaml_dict)
+-
+-    raw_replay_dir = config_dict['replay_dir']
+-    config_dict['replay_dir'] = _expand_path(raw_replay_dir)
+-
+-    raw_cookies_dir = config_dict['cookiecutters_dir']
+-    config_dict['cookiecutters_dir'] = _expand_path(raw_cookies_dir)
++    _expand_config_paths(config_dict)
+ 
+     return config_dict
+ 
+@@ -115,26 +141,26 @@
+     # Do NOT load a config. Return defaults instead.
+     if default_config:
+         logger.debug("Force ignoring user config with default_config switch.")
+-        return copy.copy(DEFAULT_CONFIG)
++        return _default_config_copy()
+ 
+-    # Load the given config file
++    # Load the given config file.
++    # NOTE: identity comparison (``is not``) is intentional and preserved from
++    # the original implementation; do not replace it with ``!=``.
+     if config_file and config_file is not USER_CONFIG_PATH:
+         logger.debug("Loading custom config from %s.", config_file)
+         return get_config(config_file)
+ 
+-    try:
+-        # Does the user set up a config environment variable?
+-        env_config_file = os.environ['COOKIECUTTER_CONFIG']
+-    except KeyError:
+-        # Load an optional user config if it exists
+-        # otherwise return the defaults
+-        if os.path.exists(USER_CONFIG_PATH):
+-            logger.debug("Loading config from %s.", USER_CONFIG_PATH)
+-            return get_config(USER_CONFIG_PATH)
+-        logger.debug("User config not found. Loading default config.")
+-        return copy.copy(DEFAULT_CONFIG)
+-    else:
+-        # There is a config environment variable. Try to load it.
+-        # Do not check for existence, so invalid file paths raise an error.
++    # There is a config environment variable. Try to load it.
++    # Do not check for existence, so invalid file paths raise an error.
++    env_config_file = os.environ.get(_CONFIG_ENV_VAR)
++    if env_config_file is not None:
+         logger.debug("User config not found or not specified. Loading default config.")
+         return get_config(env_config_file)
++
++    # Load an optional user config if it exists, otherwise return the defaults.
++    if os.path.exists(USER_CONFIG_PATH):
++        logger.debug("Loading config from %s.", USER_CONFIG_PATH)
++        return get_config(USER_CONFIG_PATH)
++
++    logger.debug("User config not found. Loading default config.")
++    return _default_config_copy()

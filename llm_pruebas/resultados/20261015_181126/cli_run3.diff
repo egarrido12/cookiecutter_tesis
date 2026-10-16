@@ -1,0 +1,180 @@
+--- a/cookiecutter/cli.py
++++ b/cookiecutter/cli.py
+@@ -34,6 +34,19 @@
+ from cookiecutter.log import configure_logger
+ from cookiecutter.main import cookiecutter
+ 
++# Errores de Cookiecutter que se reportan al usuario mostrando solo su mensaje.
++_ERRORS_REPORTED_AS_MESSAGE = (
++    ContextDecodingException,
++    OutputDirExistsException,
++    EmptyDirNameException,
++    InvalidModeException,
++    FailedHookException,
++    UnknownExtension,
++    InvalidZipRepository,
++    RepositoryNotFound,
++    RepositoryCloneFailed,
++)
++
+ 
+ def version_msg() -> str:
+     """Return the Cookiecutter version, location and Python powering it."""
+@@ -42,21 +55,37 @@
+     return f"Cookiecutter {__version__} from {location} (Python {python_version})"
+ 
+ 
++def _ensure_key_value_form(item: str) -> None:
++    """Raise ``click.BadParameter`` if ``item`` is not of the form key=value."""
++    if '=' not in item:
++        msg = (
++            f"EXTRA_CONTEXT should contain items of the form key=value; "
++            f"'{item}' doesn't match that form"
++        )
++        raise click.BadParameter(msg)
++
++
+ def validate_extra_context(
+     _ctx: Context, _param: Parameter, value: Iterable[str]
+ ) -> OrderedDict[str, str] | None:
+     """Validate extra context."""
+-    for string in value:
+-        if '=' not in string:
+-            msg = (
+-                f"EXTRA_CONTEXT should contain items of the form key=value; "
+-                f"'{string}' doesn't match that form"
+-            )
+-            raise click.BadParameter(msg)
++    for item in value:
++        _ensure_key_value_form(item)
+ 
+     # Convert tuple -- e.g.: ('program_name=foobar', 'startsecs=66')
+     # to dict -- e.g.: {'program_name': 'foobar', 'startsecs': '66'}
+-    return OrderedDict(s.split('=', 1) for s in value) or None
++    return OrderedDict(item.split('=', 1) for item in value) or None
++
++
++def _find_installed_template_names(cookiecutter_folder: str) -> list[str]:
++    """Return the names of the sub-folders that contain a cookiecutter.json file."""
++    return [
++        folder
++        for folder in os.listdir(cookiecutter_folder)
++        if os.path.exists(
++            os.path.join(cookiecutter_folder, folder, 'cookiecutter.json')
++        )
++    ]
+ 
+ 
+ def list_installed_templates(
+@@ -72,16 +101,35 @@
+         )
+         sys.exit(-1)
+ 
+-    template_names = [
+-        folder
+-        for folder in os.listdir(cookiecutter_folder)
+-        if os.path.exists(
+-            os.path.join(cookiecutter_folder, folder, 'cookiecutter.json')
+-        )
+-    ]
++    template_names = _find_installed_template_names(cookiecutter_folder)
+     click.echo(f'{len(template_names)} installed templates: ')
+     for name in template_names:
+         click.echo(f' * {name}')
++
++
++def _is_help_requested(template: str | None) -> bool:
++    """Return True if no template was given or the user explicitly asked for help."""
++    return not template or template.lower() == 'help'
++
++
++def _resolve_accept_hooks(accept_hooks: Literal['yes', 'ask', 'no']) -> bool:
++    """Translate the ``--accept-hooks`` choice into a boolean.
++
++    When the choice is ``ask``, the user is prompted to decide whether the
++    pre/post hooks should be executed.
++    """
++    if accept_hooks == "ask":
++        return click.confirm("Do you want to execute hooks?")
++    return accept_hooks == "yes"
++
++
++def _report_undefined_variable(error: UndefinedVariableInTemplate) -> None:
++    """Print the details of an undefined variable error, including its context."""
++    click.echo(f'{error.message}')
++    click.echo(f'Error message: {error.error.message}')
++
++    context_str = json.dumps(error.context, indent=4, sort_keys=True)
++    click.echo(f'Context: {context_str}')
+ 
+ 
+ @click.command(context_settings={"help_option_names": ['-h', '--help']})
+@@ -199,21 +247,16 @@
+         sys.exit(0)
+ 
+     # Raising usage, after all commands that should work without args.
+-    if not template or template.lower() == 'help':
++    if _is_help_requested(template):
+         click.echo(click.get_current_context().get_help())
+         sys.exit(0)
+ 
+     configure_logger(stream_level='DEBUG' if verbose else 'INFO', debug_file=debug_file)
+ 
+-    # If needed, prompt the user to ask whether or not they want to execute
+-    # the pre/post hooks.
+-    if accept_hooks == "ask":
+-        _accept_hooks = click.confirm("Do you want to execute hooks?")
+-    else:
+-        _accept_hooks = accept_hooks == "yes"
+-
+-    if replay_file:
+-        replay = replay_file
++    should_run_hooks = _resolve_accept_hooks(accept_hooks)
++
++    # An explicit replay file takes precedence over the --replay flag.
++    effective_replay = replay_file or replay
+ 
+     try:
+         cookiecutter(
+@@ -221,7 +264,7 @@
+             checkout,
+             no_input,
+             extra_context=extra_context,
+-            replay=replay,
++            replay=effective_replay,
+             overwrite_if_exists=overwrite_if_exists,
+             output_dir=output_dir,
+             config_file=config_file,
+@@ -229,28 +272,14 @@
+             password=os.environ.get('COOKIECUTTER_REPO_PASSWORD'),
+             directory=directory,
+             skip_if_file_exists=skip_if_file_exists,
+-            accept_hooks=_accept_hooks,
++            accept_hooks=should_run_hooks,
+             keep_project_on_failure=keep_project_on_failure,
+         )
+-    except (
+-        ContextDecodingException,
+-        OutputDirExistsException,
+-        EmptyDirNameException,
+-        InvalidModeException,
+-        FailedHookException,
+-        UnknownExtension,
+-        InvalidZipRepository,
+-        RepositoryNotFound,
+-        RepositoryCloneFailed,
+-    ) as e:
+-        click.echo(e)
++    except _ERRORS_REPORTED_AS_MESSAGE as error:
++        click.echo(error)
+         sys.exit(1)
+     except UndefinedVariableInTemplate as undefined_err:
+-        click.echo(f'{undefined_err.message}')
+-        click.echo(f'Error message: {undefined_err.error.message}')
+-
+-        context_str = json.dumps(undefined_err.context, indent=4, sort_keys=True)
+-        click.echo(f'Context: {context_str}')
++        _report_undefined_variable(undefined_err)
+         sys.exit(1)
+ 
+ 

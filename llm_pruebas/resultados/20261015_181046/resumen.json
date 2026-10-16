@@ -1,0 +1,51 @@
+{
+  "python": "3.12.15",
+  "anthropic": "1.15.0",
+  "modelo": "claude-opus-5-5",
+  "effort": "high",
+  "prompt": "Eres un ingeniero de software experto en Python. Tu tarea es refactorizar un módulo del proyecto Cookiecutter para mejorar su legibilidad y mantenibilidad, sin cambiar su comportamiento.\n\nReglas:\n- El comportamiento observable debe ser idéntico al original.\n- No cambies los nombres ni las firmas de las funciones, clases y métodos públicos (los que no empiezan con \"_\"), porque otros módulos y los tests los usan.\n- No agregues funcionalidades nuevas ni dependencias.\n- Modifica solo el archivo indicado; el resto del paquete se muestra como contexto de solo lectura.\n- Mantén la compatibilidad con las versiones de Python que el proyecto ya soporta.\n\nFormato de respuesta:\n1. El archivo completo refactorizado, en un único bloque ```python.\n2. Después, una sección \"## Refactorizaciones aplicadas\" con una lista: tipo de refactorización (según el catálogo de Fowler, por ejemplo Extract Method, Rename Variable, Inline Function...), elementos afectados y motivo.\n",
+  "linea_base": {
+    "returncode": 0,
+    "passed": 379,
+    "failed": 0,
+    "skipped": 4,
+    "errors": 0
+  },
+  "determinismo": {
+    "find": {
+      "corridas": 1,
+      "diffs_distintos": 1
+    }
+  },
+  "costo_total_usd": 0.2133,
+  "corridas": [
+    {
+      "id": "find_run1",
+      "modulo": "find",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sGX3rdxqbq2HLh2MgA",
+      "tiempo_llm_s": 20.4,
+      "tokens": {
+        "input": 27,
+        "output": 2018,
+        "cache_write": 34562,
+        "cache_read": 0
+      },
+      "costo_usd": 0.2133,
+      "lineas_agregadas": 27,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    }
+  ]
+}

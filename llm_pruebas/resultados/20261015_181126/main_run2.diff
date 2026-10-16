@@ -1,0 +1,222 @@
+--- a/cookiecutter/main.py
++++ b/cookiecutter/main.py
+@@ -24,6 +24,8 @@
+ from cookiecutter.utils import rmtree
+ 
+ logger = logging.getLogger(__name__)
++
++_NESTED_TEMPLATE_KEYS = frozenset({"template", "templates"})
+ 
+ 
+ def cookiecutter(
+@@ -69,12 +71,7 @@
+     :param keep_project_on_failure: If `True` keep generated project directory even when
+         generation fails
+     """
+-    if replay and ((no_input is not False) or (extra_context is not None)):
+-        err_msg = (
+-            "You can not use both replay and no_input or extra_context "
+-            "at the same time."
+-        )
+-        raise InvalidModeException(err_msg)
++    _check_replay_mode_compatibility(replay, no_input, extra_context)
+ 
+     config_dict = get_user_config(
+         config_file=config_file,
+@@ -89,59 +86,46 @@
+         password=password,
+         directory=directory,
+     )
+-    repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+-    # Run pre_prompt hook
+-    repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+-    # Always remove temporary dir if it was created
+-    cleanup = repo_dir != base_repo_dir
++    # The pre_prompt hook may copy the repository into a temporary directory.
++    repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else base_repo_dir
++    # Always remove the temporary dir if it was created.
++    cleanup_repo_dir = repo_dir != base_repo_dir
+ 
+     import_patch = _patch_import_path_for_repo(repo_dir)
+     template_name = os.path.basename(os.path.abspath(repo_dir))
+     if replay:
+         with import_patch:
+-            if isinstance(replay, bool):
+-                context_from_replayfile = load(config_dict['replay_dir'], template_name)
+-            else:
+-                path, template_name = os.path.split(os.path.splitext(replay)[0])
+-                context_from_replayfile = load(path, template_name)
++            context_from_replayfile, template_name = _load_replay_context(
++                replay, config_dict, template_name
++            )
+ 
+     context_file = os.path.join(repo_dir, 'cookiecutter.json')
+     logger.debug('context_file is %s', context_file)
+ 
++    # In replay mode ``extra_context`` is always None (see the mode check above).
++    context = generate_context(
++        context_file=context_file,
++        default_context=config_dict['default_context'],
++        extra_context=None if replay else extra_context,
++    )
++
+     if replay:
+-        context = generate_context(
+-            context_file=context_file,
+-            default_context=config_dict['default_context'],
+-            extra_context=None,
++        logger.debug('replayfile context: %s', context_from_replayfile)
++        context_for_prompting = _variables_missing_from_replay(
++            context, context_from_replayfile
+         )
+-        logger.debug('replayfile context: %s', context_from_replayfile)
+-        items_for_prompting = {
+-            k: v
+-            for k, v in context['cookiecutter'].items()
+-            if k not in context_from_replayfile['cookiecutter']
+-        }
+-        context_for_prompting = {}
+-        context_for_prompting['cookiecutter'] = items_for_prompting
+         context = context_from_replayfile
+         logger.debug('prompting context: %s', context_for_prompting)
+     else:
+-        context = generate_context(
+-            context_file=context_file,
+-            default_context=config_dict['default_context'],
+-            extra_context=extra_context,
+-        )
+         context_for_prompting = context
+-    # preserve the original cookiecutter options
+-    # print(context['cookiecutter'])
+-    context['_cookiecutter'] = {
+-        k: v for k, v in context['cookiecutter'].items() if not k.startswith("_")
+-    }
+-
+-    # prompt the user to manually configure at the command line.
+-    # except when 'no-input' flag is set
+-
++
++    # Preserve the original cookiecutter options.
++    context['_cookiecutter'] = _public_variables(context['cookiecutter'])
++
++    # Prompt the user to manually configure at the command line,
++    # except when 'no-input' flag is set.
+     with import_patch:
+-        if {"template", "templates"} & set(context["cookiecutter"].keys()):
++        if _has_nested_templates(context):
+             nested_template = choose_nested_template(context, repo_dir, no_input)
+             return cookiecutter(
+                 template=nested_template,
+@@ -166,17 +150,7 @@
+ 
+     logger.debug('context is %s', context)
+ 
+-    # include template dir or url in the context dict
+-    context['cookiecutter']['_template'] = template
+-
+-    # include output+dir in the context dict
+-    context['cookiecutter']['_output_dir'] = os.path.abspath(output_dir)
+-
+-    # include repo dir or url in the context dict
+-    context['cookiecutter']['_repo_dir'] = f"{repo_dir}"
+-
+-    # include checkout details in the context dict
+-    context['cookiecutter']['_checkout'] = checkout
++    _add_generation_metadata(context, template, output_dir, repo_dir, checkout)
+ 
+     dump(config_dict['replay_dir'], template_name, context)
+ 
+@@ -192,15 +166,91 @@
+             keep_project_on_failure=keep_project_on_failure,
+         )
+ 
+-    # Cleanup (if required)
+-    if cleanup:
++    if cleanup_repo_dir:
+         rmtree(repo_dir)
+     if cleanup_base_repo_dir:
+         rmtree(base_repo_dir)
+     return result
+ 
+ 
++def _check_replay_mode_compatibility(
++    replay: bool | str | None,
++    no_input: bool,
++    extra_context: dict[str, Any] | None,
++) -> None:
++    """Raise if replay is combined with ``no_input`` or ``extra_context``."""
++    if replay and ((no_input is not False) or (extra_context is not None)):
++        err_msg = (
++            "You can not use both replay and no_input or extra_context "
++            "at the same time."
++        )
++        raise InvalidModeException(err_msg)
++
++
++def _load_replay_context(
++    replay: bool | str,
++    config_dict: dict[str, Any],
++    template_name: str,
++) -> tuple[dict[str, Any], str]:
++    """Load the replay context and return it with the template name it belongs to.
++
++    If ``replay`` is a boolean, the replay file is looked up in the configured
++    ``replay_dir`` using ``template_name``. Otherwise ``replay`` is a path to a
++    replay file, from which both the directory and the template name are derived.
++    """
++    if isinstance(replay, bool):
++        return load(config_dict['replay_dir'], template_name), template_name
++
++    replay_dir, replay_template_name = os.path.split(os.path.splitext(replay)[0])
++    return load(replay_dir, replay_template_name), replay_template_name
++
++
++def _variables_missing_from_replay(
++    context: dict[str, Any], context_from_replayfile: dict[str, Any]
++) -> dict[str, Any]:
++    """Return a prompting context with the variables not stored in the replay file."""
++    replayed_variables = context_from_replayfile['cookiecutter']
++    return {
++        'cookiecutter': {
++            key: value
++            for key, value in context['cookiecutter'].items()
++            if key not in replayed_variables
++        }
++    }
++
++
++def _public_variables(cookiecutter_dict: dict[str, Any]) -> dict[str, Any]:
++    """Return the variables whose names do not start with an underscore."""
++    return {
++        key: value
++        for key, value in cookiecutter_dict.items()
++        if not key.startswith("_")
++    }
++
++
++def _has_nested_templates(context: dict[str, Any]) -> bool:
++    """Return True if the context defines nested templates to choose from."""
++    return not _NESTED_TEMPLATE_KEYS.isdisjoint(context["cookiecutter"].keys())
++
++
++def _add_generation_metadata(
++    context: dict[str, Any],
++    template: str,
++    output_dir: str,
++    repo_dir: Path | str,
++    checkout: str | None,
++) -> None:
++    """Store template, output dir, repo dir and checkout details in the context."""
++    cookiecutter_dict = context['cookiecutter']
++    cookiecutter_dict['_template'] = template
++    cookiecutter_dict['_output_dir'] = os.path.abspath(output_dir)
++    cookiecutter_dict['_repo_dir'] = f"{repo_dir}"
++    cookiecutter_dict['_checkout'] = checkout
++
++
+ class _patch_import_path_for_repo:  # noqa: N801
++    """Context manager that temporarily appends the repo dir to ``sys.path``."""
++
+     def __init__(self, repo_dir: Path | str) -> None:
+         self._repo_dir = f"{repo_dir}" if isinstance(repo_dir, Path) else repo_dir
+ 

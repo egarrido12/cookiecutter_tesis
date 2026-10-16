@@ -1,0 +1,165 @@
+--- a/cookiecutter/extensions.py
++++ b/cookiecutter/extensions.py
+@@ -21,6 +21,9 @@
+     from jinja2.parser import Parser
+ 
+ 
++_DEFAULT_DATETIME_FORMAT = '%Y-%m-%d'
++
++
+ class JsonifyExtension(Extension):
+     """Jinja2 extension to convert a Python object to JSON."""
+ 
+@@ -42,10 +45,11 @@
+         super().__init__(environment)
+ 
+         def random_ascii_string(length: int, punctuation: bool = False) -> str:
+-            if punctuation:
+-                corpus = f'{string.ascii_letters}{string.punctuation}'
+-            else:
+-                corpus = string.ascii_letters
++            corpus = (
++                string.ascii_letters + string.punctuation
++                if punctuation
++                else string.ascii_letters
++            )
+             return "".join(choice(corpus) for _ in range(length))
+ 
+         environment.globals.update(random_ascii_string=random_ascii_string)
+@@ -76,18 +80,18 @@
+             """Slugifies the value."""
+             return pyslugify(
+                 value,
+-                entities,
+-                decimal,
+-                hexadecimal,
+-                max_length,
+-                word_boundary,
+-                separator,
+-                save_order,
+-                stopwords,
+-                regex_pattern,
+-                lowercase,
+-                replacements,
+-                allow_unicode,
++                entities=entities,
++                decimal=decimal,
++                hexadecimal=hexadecimal,
++                max_length=max_length,
++                word_boundary=word_boundary,
++                separator=separator,
++                save_order=save_order,
++                stopwords=stopwords,
++                regex_pattern=regex_pattern,
++                lowercase=lowercase,
++                replacements=replacements,
++                allow_unicode=allow_unicode,
+             )
+ 
+         environment.filters['slugify'] = slugify
+@@ -116,7 +120,9 @@
+         """Jinja2 Extension constructor."""
+         super().__init__(environment)
+ 
+-        environment.extend(datetime_format='%Y-%m-%d')
++        environment.extend(datetime_format=_DEFAULT_DATETIME_FORMAT)
++
++    # --- Runtime callbacks (invoked from the compiled template) ---------------
+ 
+     def _datetime(
+         self,
+@@ -125,51 +131,66 @@
+         offset: str,
+         datetime_format: str | None,
+     ) -> str:
+-        d = arrow.now(timezone)
++        now = arrow.now(timezone)
++        shifted = now.shift(**self._parse_shift_params(operator, offset))
++        return shifted.strftime(self._resolve_datetime_format(datetime_format))
+ 
+-        # parse shift params from offset and include operator
++    def _now(self, timezone: str, datetime_format: str | None) -> str:
++        datetime_format = self._resolve_datetime_format(datetime_format)
++        return arrow.now(timezone).strftime(datetime_format)
++
++    # --- Helpers ---------------------------------------------------------------
++
++    @staticmethod
++    def _parse_shift_params(operator: str, offset: str) -> dict[str, float]:
++        """Turn an offset like ``'days=1, hours=2'`` into ``arrow.shift`` kwargs.
++
++        The operator (``'+'`` or ``'-'``) is applied as the sign of every value.
++        """
+         shift_params = {}
+         for param in offset.split(','):
+             interval, value = param.split('=')
+             shift_params[interval.strip()] = float(operator + value.strip())
+-        d = d.shift(**shift_params)
++        return shift_params
+ 
++    def _resolve_datetime_format(self, datetime_format: str | None) -> str:
++        """Return the given format, or the environment's default if it is None."""
+         if datetime_format is None:
+-            datetime_format = self.environment.datetime_format  # type: ignore[attr-defined]
+-        return d.strftime(datetime_format)
++            return self.environment.datetime_format  # type: ignore[attr-defined]
++        return datetime_format
+ 
+-    def _now(self, timezone: str, datetime_format: str | None) -> str:
+-        if datetime_format is None:
+-            datetime_format = self.environment.datetime_format  # type: ignore[attr-defined]
+-        return arrow.now(timezone).strftime(datetime_format)
++    # --- Template parsing ------------------------------------------------------
+ 
+     def parse(self, parser: Parser) -> nodes.Output:
+         """Parse datetime template and add datetime value."""
+         lineno = next(parser.stream).lineno
+ 
+         node = parser.parse_expression()
++        datetime_format = self._parse_datetime_format(parser)
+ 
++        call_method = self._build_call_method(node, datetime_format, lineno)
++        return nodes.Output([call_method], lineno=lineno)
++
++    @staticmethod
++    def _parse_datetime_format(parser: Parser) -> nodes.Expr:
++        """Parse the optional ``, '<format>'`` argument of the ``now`` tag."""
+         if parser.stream.skip_if('comma'):
+-            datetime_format = parser.parse_expression()
+-        else:
+-            datetime_format = nodes.Const(None)
++            return parser.parse_expression()
++        return nodes.Const(None)
+ 
+-        if isinstance(node, nodes.Add):
+-            call_method = self.call_method(
++    def _build_call_method(
++        self, node: nodes.Expr, datetime_format: nodes.Expr, lineno: int
++    ) -> nodes.Call:
++        """Build the call to ``_datetime`` (with offset) or ``_now`` (without)."""
++        if isinstance(node, (nodes.Add, nodes.Sub)):
++            operator = '+' if isinstance(node, nodes.Add) else '-'
++            return self.call_method(
+                 '_datetime',
+-                [node.left, nodes.Const('+'), node.right, datetime_format],
++                [node.left, nodes.Const(operator), node.right, datetime_format],
+                 lineno=lineno,
+             )
+-        elif isinstance(node, nodes.Sub):
+-            call_method = self.call_method(
+-                '_datetime',
+-                [node.left, nodes.Const('-'), node.right, datetime_format],
+-                lineno=lineno,
+-            )
+-        else:
+-            call_method = self.call_method(
+-                '_now',
+-                [node, datetime_format],
+-                lineno=lineno,
+-            )
+-        return nodes.Output([call_method], lineno=lineno)
++        return self.call_method(
++            '_now',
++            [node, datetime_format],
++            lineno=lineno,
++        )

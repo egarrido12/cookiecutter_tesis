@@ -1,0 +1,137 @@
+--- a/cookiecutter/extensions.py
++++ b/cookiecutter/extensions.py
+@@ -21,6 +21,10 @@
+     from jinja2.parser import Parser
+ 
+ 
++_DEFAULT_JSON_INDENT = 4
++_DEFAULT_DATETIME_FORMAT = '%Y-%m-%d'
++
++
+ class JsonifyExtension(Extension):
+     """Jinja2 extension to convert a Python object to JSON."""
+ 
+@@ -28,7 +32,7 @@
+         """Initialize the extension with the given environment."""
+         super().__init__(environment)
+ 
+-        def jsonify(obj: Any, indent: int = 4) -> str:
++        def jsonify(obj: Any, indent: int = _DEFAULT_JSON_INDENT) -> str:
+             return json.dumps(obj, sort_keys=True, indent=indent)
+ 
+         environment.filters['jsonify'] = jsonify
+@@ -42,10 +46,11 @@
+         super().__init__(environment)
+ 
+         def random_ascii_string(length: int, punctuation: bool = False) -> str:
+-            if punctuation:
+-                corpus = f'{string.ascii_letters}{string.punctuation}'
+-            else:
+-                corpus = string.ascii_letters
++            corpus = (
++                f'{string.ascii_letters}{string.punctuation}'
++                if punctuation
++                else string.ascii_letters
++            )
+             return "".join(choice(corpus) for _ in range(length))
+ 
+         environment.globals.update(random_ascii_string=random_ascii_string)
+@@ -74,6 +79,9 @@
+             allow_unicode: bool = False,
+         ) -> str:
+             """Slugifies the value."""
++            # Arguments are passed positionally on purpose: it keeps this
++            # wrapper independent of the parameter names used by the
++            # installed python-slugify version.
+             return pyslugify(
+                 value,
+                 entities,
+@@ -116,7 +124,25 @@
+         """Jinja2 Extension constructor."""
+         super().__init__(environment)
+ 
+-        environment.extend(datetime_format='%Y-%m-%d')
++        environment.extend(datetime_format=_DEFAULT_DATETIME_FORMAT)
++
++    def _resolve_datetime_format(self, datetime_format: str | None) -> str:
++        """Return the given format, or the environment default if it is None."""
++        if datetime_format is None:
++            return self.environment.datetime_format  # type: ignore[attr-defined]
++        return datetime_format
++
++    @staticmethod
++    def _parse_shift_params(operator: str, offset: str) -> dict[str, float]:
++        """Parse an offset like ``'days=1, hours=2'`` into ``arrow`` shift params.
++
++        The operator (``'+'`` or ``'-'``) is applied as the sign of every value.
++        """
++        shift_params = {}
++        for param in offset.split(','):
++            interval, value = param.split('=')
++            shift_params[interval.strip()] = float(operator + value.strip())
++        return shift_params
+ 
+     def _datetime(
+         self,
+@@ -125,45 +151,34 @@
+         offset: str,
+         datetime_format: str | None,
+     ) -> str:
+-        d = arrow.now(timezone)
+-
+-        # parse shift params from offset and include operator
+-        shift_params = {}
+-        for param in offset.split(','):
+-            interval, value = param.split('=')
+-            shift_params[interval.strip()] = float(operator + value.strip())
+-        d = d.shift(**shift_params)
+-
+-        if datetime_format is None:
+-            datetime_format = self.environment.datetime_format  # type: ignore[attr-defined]
+-        return d.strftime(datetime_format)
++        current_time = arrow.now(timezone)
++        shift_params = self._parse_shift_params(operator, offset)
++        shifted_time = current_time.shift(**shift_params)
++        return shifted_time.strftime(self._resolve_datetime_format(datetime_format))
+ 
+     def _now(self, timezone: str, datetime_format: str | None) -> str:
+-        if datetime_format is None:
+-            datetime_format = self.environment.datetime_format  # type: ignore[attr-defined]
++        datetime_format = self._resolve_datetime_format(datetime_format)
+         return arrow.now(timezone).strftime(datetime_format)
++
++    @staticmethod
++    def _parse_datetime_format(parser: Parser) -> nodes.Expr:
++        """Parse the optional ``, '<format>'`` argument of the ``now`` tag."""
++        if parser.stream.skip_if('comma'):
++            return parser.parse_expression()
++        return nodes.Const(None)
+ 
+     def parse(self, parser: Parser) -> nodes.Output:
+         """Parse datetime template and add datetime value."""
+         lineno = next(parser.stream).lineno
+ 
+         node = parser.parse_expression()
++        datetime_format = self._parse_datetime_format(parser)
+ 
+-        if parser.stream.skip_if('comma'):
+-            datetime_format = parser.parse_expression()
+-        else:
+-            datetime_format = nodes.Const(None)
+-
+-        if isinstance(node, nodes.Add):
++        if isinstance(node, (nodes.Add, nodes.Sub)):
++            operator = '+' if isinstance(node, nodes.Add) else '-'
+             call_method = self.call_method(
+                 '_datetime',
+-                [node.left, nodes.Const('+'), node.right, datetime_format],
+-                lineno=lineno,
+-            )
+-        elif isinstance(node, nodes.Sub):
+-            call_method = self.call_method(
+-                '_datetime',
+-                [node.left, nodes.Const('-'), node.right, datetime_format],
++                [node.left, nodes.Const(operator), node.right, datetime_format],
+                 lineno=lineno,
+             )
+         else:

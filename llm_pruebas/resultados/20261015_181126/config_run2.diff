@@ -1,0 +1,157 @@
+--- a/cookiecutter/config.py
++++ b/cookiecutter/config.py
+@@ -32,6 +32,13 @@
+     'abbreviations': BUILTIN_ABBREVIATIONS,
+ }
+ 
++# Environment variable that may point to an alternative user config file.
++_CONFIG_ENV_VAR = 'COOKIECUTTER_CONFIG'
++
++# Config settings that hold paths which may contain ``~`` or environment
++# variables. They are expanded in this order.
++_PATH_SETTINGS = ('replay_dir', 'cookiecutters_dir')
++
+ 
+ def _expand_path(path: str) -> str:
+     """Expand both environment variables and user home in the given path."""
+@@ -47,15 +54,43 @@
+     """
+     new_config = copy.deepcopy(default)
+ 
+-    for k, v in overwrite.items():
++    for key, value in overwrite.items():
+         # Make sure to preserve existing items in
+         # nested dicts, for example `abbreviations`
+-        if isinstance(v, dict):
+-            new_config[k] = merge_configs(default.get(k, {}), v)
++        if isinstance(value, dict):
++            new_config[key] = merge_configs(default.get(key, {}), value)
+         else:
+-            new_config[k] = v
++            new_config[key] = value
+ 
+     return new_config
++
++
++def _read_yaml_config(config_path: Path | str) -> dict[str, Any]:
++    """Parse the YAML file at ``config_path`` and return its top-level mapping.
++
++    An empty file is treated as an empty mapping.
++
++    :raises InvalidConfiguration: If the file is not valid YAML or its
++        top-level element is not a mapping.
++    """
++    with open(config_path, encoding='utf-8') as file_handle:
++        try:
++            yaml_dict = yaml.safe_load(file_handle) or {}
++        except yaml.YAMLError as e:
++            msg = f'Unable to parse YAML file {config_path}.'
++            raise InvalidConfiguration(msg) from e
++
++    if not isinstance(yaml_dict, dict):
++        msg = f'Top-level element of YAML file {config_path} should be an object.'
++        raise InvalidConfiguration(msg)
++
++    return yaml_dict
++
++
++def _expand_path_settings(config_dict: dict[str, Any]) -> None:
++    """Expand, in place, every path-like setting of ``config_dict``."""
++    for setting in _PATH_SETTINGS:
++        config_dict[setting] = _expand_path(config_dict[setting])
+ 
+ 
+ def get_config(config_path: Path | str) -> dict[str, Any]:
+@@ -65,25 +100,47 @@
+         raise ConfigDoesNotExistException(msg)
+ 
+     logger.debug('config_path is %s', config_path)
+-    with open(config_path, encoding='utf-8') as file_handle:
+-        try:
+-            yaml_dict = yaml.safe_load(file_handle) or {}
+-        except yaml.YAMLError as e:
+-            msg = f'Unable to parse YAML file {config_path}.'
+-            raise InvalidConfiguration(msg) from e
+-        if not isinstance(yaml_dict, dict):
+-            msg = f'Top-level element of YAML file {config_path} should be an object.'
+-            raise InvalidConfiguration(msg)
++    yaml_dict = _read_yaml_config(config_path)
+ 
+     config_dict = merge_configs(DEFAULT_CONFIG, yaml_dict)
+-
+-    raw_replay_dir = config_dict['replay_dir']
+-    config_dict['replay_dir'] = _expand_path(raw_replay_dir)
+-
+-    raw_cookies_dir = config_dict['cookiecutters_dir']
+-    config_dict['cookiecutters_dir'] = _expand_path(raw_cookies_dir)
++    _expand_path_settings(config_dict)
+ 
+     return config_dict
++
++
++def _get_default_config() -> dict[str, Any]:
++    """Return a (shallow) copy of the default configuration."""
++    return copy.copy(DEFAULT_CONFIG)
++
++
++def _is_custom_config_file(config_file: str | None) -> bool:
++    """Tell whether ``config_file`` is an explicitly given, non-default file.
++
++    Note: the identity comparison (``is not``) against ``USER_CONFIG_PATH``
++    is intentional and preserved from the original implementation.
++    """
++    return bool(config_file) and config_file is not USER_CONFIG_PATH
++
++
++def _get_env_or_user_config() -> dict[str, Any]:
++    """Load the config pointed to by the environment, the user file or defaults.
++
++    If the ``COOKIECUTTER_CONFIG`` environment variable is set, load the config
++    from that path without checking for existence, so invalid paths raise an
++    error. Otherwise load the optional user config if it exists, falling back
++    to the default values.
++    """
++    env_config_file = os.environ.get(_CONFIG_ENV_VAR)
++    if env_config_file is not None:
++        logger.debug("User config not found or not specified. Loading default config.")
++        return get_config(env_config_file)
++
++    if os.path.exists(USER_CONFIG_PATH):
++        logger.debug("Loading config from %s.", USER_CONFIG_PATH)
++        return get_config(USER_CONFIG_PATH)
++
++    logger.debug("User config not found. Loading default config.")
++    return _get_default_config()
+ 
+ 
+ def get_user_config(
+@@ -115,26 +172,11 @@
+     # Do NOT load a config. Return defaults instead.
+     if default_config:
+         logger.debug("Force ignoring user config with default_config switch.")
+-        return copy.copy(DEFAULT_CONFIG)
++        return _get_default_config()
+ 
+     # Load the given config file
+-    if config_file and config_file is not USER_CONFIG_PATH:
++    if _is_custom_config_file(config_file):
+         logger.debug("Loading custom config from %s.", config_file)
+         return get_config(config_file)
+ 
+-    try:
+-        # Does the user set up a config environment variable?
+-        env_config_file = os.environ['COOKIECUTTER_CONFIG']
+-    except KeyError:
+-        # Load an optional user config if it exists
+-        # otherwise return the defaults
+-        if os.path.exists(USER_CONFIG_PATH):
+-            logger.debug("Loading config from %s.", USER_CONFIG_PATH)
+-            return get_config(USER_CONFIG_PATH)
+-        logger.debug("User config not found. Loading default config.")
+-        return copy.copy(DEFAULT_CONFIG)
+-    else:
+-        # There is a config environment variable. Try to load it.
+-        # Do not check for existence, so invalid file paths raise an error.
+-        logger.debug("User config not found or not specified. Loading default config.")
+-        return get_config(env_config_file)
++    return _get_env_or_user_config()

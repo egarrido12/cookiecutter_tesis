@@ -1,0 +1,123 @@
+--- a/cookiecutter/repository.py
++++ b/cookiecutter/repository.py
+@@ -23,6 +23,8 @@
+ """,
+     re.VERBOSE,
+ )
++
++_CONTEXT_FILE_NAME = 'cookiecutter.json'
+ 
+ 
+ def is_repo_url(value: str) -> bool:
+@@ -60,11 +62,63 @@
+     :return: True if the `repo_directory` is valid, else False.
+     """
+     repo_directory_exists = os.path.isdir(repo_directory)
+-
+     repo_config_exists = os.path.isfile(
+-        os.path.join(repo_directory, 'cookiecutter.json')
++        os.path.join(repo_directory, _CONTEXT_FILE_NAME)
+     )
+     return repo_directory_exists and repo_config_exists
++
++
++def _get_repository_candidates(
++    template: str,
++    clone_to_dir: Path | str,
++    checkout: str | None,
++    no_input: bool,
++    password: str | None,
++) -> tuple[list[str], bool]:
++    """Obtain the candidate directories for an (already expanded) template.
++
++    Zip archives are unpacked, repository URLs are cloned and anything else
++    is treated as a local path, either as-is or relative to ``clone_to_dir``.
++
++    :return: A tuple with the list of candidate directories and a boolean
++        telling whether the resulting directory must be cleaned up afterwards.
++    """
++    if is_zip_file(template):
++        unzipped_dir = unzip(
++            zip_uri=template,
++            is_url=is_repo_url(template),
++            clone_to_dir=clone_to_dir,
++            no_input=no_input,
++            password=password,
++        )
++        return [unzipped_dir], True
++
++    if is_repo_url(template):
++        cloned_repo = clone(
++            repo_url=template,
++            checkout=checkout,
++            clone_to_dir=clone_to_dir,
++            no_input=no_input,
++        )
++        return [cloned_repo], False
++
++    return [template, os.path.join(clone_to_dir, template)], False
++
++
++def _join_subdirectory(candidates: list[str], directory: str | None) -> list[str]:
++    """Point every candidate to ``directory`` inside it, if one is given."""
++    if not directory:
++        return candidates
++    return [os.path.join(candidate, directory) for candidate in candidates]
++
++
++def _repository_not_found_message(template: str, candidates: list[str]) -> str:
++    """Build the error message used when no valid repository is found."""
++    locations = '\n'.join(candidates)
++    return (
++        f'A valid repository for "{template}" could not be found in the following '
++        f'locations:\n{locations}'
++    )
+ 
+ 
+ def determine_repo_dir(
+@@ -100,40 +154,14 @@
+     """
+     template = expand_abbreviations(template, abbreviations)
+ 
+-    if is_zip_file(template):
+-        unzipped_dir = unzip(
+-            zip_uri=template,
+-            is_url=is_repo_url(template),
+-            clone_to_dir=clone_to_dir,
+-            no_input=no_input,
+-            password=password,
+-        )
+-        repository_candidates = [unzipped_dir]
+-        cleanup = True
+-    elif is_repo_url(template):
+-        cloned_repo = clone(
+-            repo_url=template,
+-            checkout=checkout,
+-            clone_to_dir=clone_to_dir,
+-            no_input=no_input,
+-        )
+-        repository_candidates = [cloned_repo]
+-        cleanup = False
+-    else:
+-        repository_candidates = [template, os.path.join(clone_to_dir, template)]
+-        cleanup = False
+-
+-    if directory:
+-        repository_candidates = [
+-            os.path.join(s, directory) for s in repository_candidates
+-        ]
++    repository_candidates, cleanup = _get_repository_candidates(
++        template, clone_to_dir, checkout, no_input, password
++    )
++    repository_candidates = _join_subdirectory(repository_candidates, directory)
+ 
+     for repo_candidate in repository_candidates:
+         if repository_has_cookiecutter_json(repo_candidate):
+             return repo_candidate, cleanup
+ 
+-    msg = (
+-        'A valid repository for "{}" could not be found in the following '
+-        'locations:\n{}'.format(template, '\n'.join(repository_candidates))
+-    )
++    msg = _repository_not_found_message(template, repository_candidates)
+     raise RepositoryNotFound(msg)

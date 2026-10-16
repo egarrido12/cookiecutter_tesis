@@ -1,0 +1,70 @@
+--- a/cookiecutter/log.py
++++ b/cookiecutter/log.py
+@@ -18,6 +18,32 @@
+     'INFO': '%(levelname)s: %(message)s',
+ }
+ 
++_COOKIECUTTER_LOGGER_NAME = 'cookiecutter'
++_FILE_LOG_LEVEL_NAME = 'DEBUG'
++
++
++def _configure_handler(handler: logging.Handler, level_name: str) -> logging.Handler:
++    """Apply the format and level associated with ``level_name`` to ``handler``.
++
++    :param handler: Handler to configure.
++    :param level_name: Key of both ``LOG_FORMATS`` and ``LOG_LEVELS``.
++    :return: The same handler, already configured.
++    """
++    formatter = logging.Formatter(LOG_FORMATS[level_name])
++    handler.setLevel(LOG_LEVELS[level_name])
++    handler.setFormatter(formatter)
++    return handler
++
++
++def _create_file_handler(debug_file: str) -> logging.Handler:
++    """Create a handler that writes DEBUG-level records into ``debug_file``."""
++    return _configure_handler(logging.FileHandler(debug_file), _FILE_LOG_LEVEL_NAME)
++
++
++def _create_stream_handler(stream_level: str) -> logging.Handler:
++    """Create a handler that writes records of ``stream_level`` to stdout."""
++    return _configure_handler(logging.StreamHandler(stream=sys.stdout), stream_level)
++
+ 
+ def configure_logger(
+     stream_level: str = 'DEBUG', debug_file: str | None = None
+@@ -27,30 +53,16 @@
+     Set up logging to stdout with given level. If ``debug_file`` is given set
+     up logging to file with DEBUG level.
+     """
+-    # Set up 'cookiecutter' logger
+-    logger = logging.getLogger('cookiecutter')
++    logger = logging.getLogger(_COOKIECUTTER_LOGGER_NAME)
+     logger.setLevel(logging.DEBUG)
+ 
+     # Remove all attached handlers, in case there was
+     # a logger with using the name 'cookiecutter'
+-    del logger.handlers[:]
++    logger.handlers.clear()
+ 
+-    # Create a file handler if a log file is provided
+     if debug_file is not None:
+-        debug_formatter = logging.Formatter(LOG_FORMATS['DEBUG'])
+-        file_handler = logging.FileHandler(debug_file)
+-        file_handler.setLevel(LOG_LEVELS['DEBUG'])
+-        file_handler.setFormatter(debug_formatter)
+-        logger.addHandler(file_handler)
++        logger.addHandler(_create_file_handler(debug_file))
+ 
+-    # Get settings based on the given stream_level
+-    log_formatter = logging.Formatter(LOG_FORMATS[stream_level])
+-    log_level = LOG_LEVELS[stream_level]
+-
+-    # Create a stream handler
+-    stream_handler = logging.StreamHandler(stream=sys.stdout)
+-    stream_handler.setLevel(log_level)
+-    stream_handler.setFormatter(log_formatter)
+-    logger.addHandler(stream_handler)
++    logger.addHandler(_create_stream_handler(stream_level))
+ 
+     return logger

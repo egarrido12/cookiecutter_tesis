@@ -1,0 +1,56 @@
+--- a/cookiecutter/environment.py
++++ b/cookiecutter/environment.py
+@@ -7,6 +7,16 @@
+ from jinja2 import Environment, StrictUndefined
+ 
+ from cookiecutter.exceptions import UnknownExtension
++
++# Extensiones que Cookiecutter carga siempre, antes de las declaradas por la
++# plantilla en la clave ``_extensions`` de cookiecutter.json.
++_DEFAULT_EXTENSIONS = (
++    'cookiecutter.extensions.JsonifyExtension',
++    'cookiecutter.extensions.RandomStringExtension',
++    'cookiecutter.extensions.SlugifyExtension',
++    'cookiecutter.extensions.TimeExtension',
++    'cookiecutter.extensions.UUIDExtension',
++)
+ 
+ 
+ class ExtensionLoaderMixin:
+@@ -21,20 +31,12 @@
+ 
+         Does the following:
+ 
+-        1. Establishes default_extensions (currently just a Time feature)
++        1. Establishes the default extensions bundled with Cookiecutter.
+         2. Reads extensions set in the cookiecutter.json _extensions key.
+         3. Attempts to load the extensions. Provides useful error if fails.
+         """
+         context = context or {}
+-
+-        default_extensions = [
+-            'cookiecutter.extensions.JsonifyExtension',
+-            'cookiecutter.extensions.RandomStringExtension',
+-            'cookiecutter.extensions.SlugifyExtension',
+-            'cookiecutter.extensions.TimeExtension',
+-            'cookiecutter.extensions.UUIDExtension',
+-        ]
+-        extensions = default_extensions + self._read_extensions(context)
++        extensions = [*_DEFAULT_EXTENSIONS, *self._read_extensions(context)]
+ 
+         try:
+             super().__init__(extensions=extensions, **kwargs)  # type: ignore[call-arg]
+@@ -49,11 +51,11 @@
+         list instead.
+         """
+         try:
+-            extensions = context['cookiecutter']['_extensions']
++            template_extensions = context['cookiecutter']['_extensions']
+         except KeyError:
+             return []
+         else:
+-            return [str(ext) for ext in extensions]
++            return [str(extension) for extension in template_extensions]
+ 
+ 
+ class StrictEnvironment(ExtensionLoaderMixin, Environment):

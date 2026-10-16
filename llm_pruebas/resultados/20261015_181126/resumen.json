@@ -1,0 +1,1557 @@
+{
+  "python": "3.12.15",
+  "anthropic": "1.15.0",
+  "modelo": "claude-opus-5-5",
+  "effort": "high",
+  "prompt": "Eres un ingeniero de software experto en Python. Tu tarea es refactorizar un módulo del proyecto Cookiecutter para mejorar su legibilidad y mantenibilidad, sin cambiar su comportamiento.\n\nReglas:\n- El comportamiento observable debe ser idéntico al original.\n- No cambies los nombres ni las firmas de las funciones, clases y métodos públicos (los que no empiezan con \"_\"), porque otros módulos y los tests los usan.\n- No agregues funcionalidades nuevas ni dependencias.\n- Modifica solo el archivo indicado; el resto del paquete se muestra como contexto de solo lectura.\n- Mantén la compatibilidad con las versiones de Python que el proyecto ya soporta.\n\nFormato de respuesta:\n1. El archivo completo refactorizado, en un único bloque ```python.\n2. Después, una sección \"## Refactorizaciones aplicadas\" con una lista: tipo de refactorización (según el catálogo de Fowler, por ejemplo Extract Method, Rename Variable, Inline Function...), elementos afectados y motivo.\n",
+  "linea_base": {
+    "returncode": 0,
+    "passed": 379,
+    "failed": 0,
+    "skipped": 4,
+    "errors": 0
+  },
+  "determinismo": {
+    "__init__": {
+      "corridas": 3,
+      "diffs_distintos": 1
+    },
+    "__main__": {
+      "corridas": 3,
+      "diffs_distintos": 1
+    },
+    "cli": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "config": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "environment": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "exceptions": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "extensions": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "find": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "generate": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "hooks": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "log": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "main": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "prompt": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "replay": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "repository": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "utils": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    },
+    "vcs": {
+      "corridas": 3,
+      "diffs_distintos": 3
+    }
+  },
+  "costo_total_usd": 6.798,
+  "corridas": [
+    {
+      "id": "__init___run1",
+      "modulo": "__init__",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sKPmPpWkCJmU8ZZqDp",
+      "tiempo_llm_s": 18.0,
+      "tokens": {
+        "input": 29,
+        "output": 1329,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0336,
+      "lineas_agregadas": 0,
+      "lineas_eliminadas": 0,
+      "sin_cambios": true,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "__init___run2",
+      "modulo": "__init__",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sLtjT1wLM2EYMTb1ix",
+      "tiempo_llm_s": 27.0,
+      "tokens": {
+        "input": 29,
+        "output": 1154,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0301,
+      "lineas_agregadas": 0,
+      "lineas_eliminadas": 0,
+      "sin_cambios": true,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "__init___run3",
+      "modulo": "__init__",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sP6n4bpKd9X6Pqyvyd",
+      "tiempo_llm_s": 15.3,
+      "tokens": {
+        "input": 29,
+        "output": 1430,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0356,
+      "lineas_agregadas": 0,
+      "lineas_eliminadas": 0,
+      "sin_cambios": true,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "__main___run1",
+      "modulo": "__main__",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sQQ7dQWiB6yq2EYj5v",
+      "tiempo_llm_s": 12.0,
+      "tokens": {
+        "input": 29,
+        "output": 1047,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.028,
+      "lineas_agregadas": 0,
+      "lineas_eliminadas": 0,
+      "sin_cambios": true,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "__main___run2",
+      "modulo": "__main__",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sRUs9F6xPUt5N8eQSx",
+      "tiempo_llm_s": 13.8,
+      "tokens": {
+        "input": 29,
+        "output": 1180,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0306,
+      "lineas_agregadas": 0,
+      "lineas_eliminadas": 0,
+      "sin_cambios": true,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "__main___run3",
+      "modulo": "__main__",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sSht1McMuspCThhtoD",
+      "tiempo_llm_s": 13.3,
+      "tokens": {
+        "input": 29,
+        "output": 1243,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0319,
+      "lineas_agregadas": 0,
+      "lineas_eliminadas": 0,
+      "sin_cambios": true,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "cli_run1",
+      "modulo": "cli",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sTt5xqnhkFprUnXVoL",
+      "tiempo_llm_s": 59.9,
+      "tokens": {
+        "input": 28,
+        "output": 7727,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1616,
+      "lineas_agregadas": 78,
+      "lineas_eliminadas": 46,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "cli_run2",
+      "modulo": "cli",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4sYU6Ty6HNdDGrq6P6A",
+      "tiempo_llm_s": 55.0,
+      "tokens": {
+        "input": 28,
+        "output": 7131,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1496,
+      "lineas_agregadas": 85,
+      "lineas_eliminadas": 55,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "cli_run3",
+      "modulo": "cli",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4scmCUZTcP6GS85DGsi",
+      "tiempo_llm_s": 46.8,
+      "tokens": {
+        "input": 28,
+        "output": 7286,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1527,
+      "lineas_agregadas": 73,
+      "lineas_eliminadas": 44,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "config_run1",
+      "modulo": "config",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4soqvXmJXnpSt4P5DaR",
+      "tiempo_llm_s": 42.3,
+      "tokens": {
+        "input": 27,
+        "output": 5046,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1079,
+      "lineas_agregadas": 60,
+      "lineas_eliminadas": 35,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "config_run2",
+      "modulo": "config",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4ssAYoVFEBKxrvPciwR",
+      "tiempo_llm_s": 57.9,
+      "tokens": {
+        "input": 27,
+        "output": 7126,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1495,
+      "lineas_agregadas": 79,
+      "lineas_eliminadas": 37,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "config_run3",
+      "modulo": "config",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4swiodMRWjZ4dvMq3Y6",
+      "tiempo_llm_s": 39.6,
+      "tokens": {
+        "input": 27,
+        "output": 4913,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1053,
+      "lineas_agregadas": 61,
+      "lineas_eliminadas": 35,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "environment_run1",
+      "modulo": "environment",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4szrL9YTxbLj8hqRXYX",
+      "tiempo_llm_s": 26.1,
+      "tokens": {
+        "input": 28,
+        "output": 2912,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0653,
+      "lineas_agregadas": 14,
+      "lineas_eliminadas": 12,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "environment_run2",
+      "modulo": "environment",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg4t34dPC3gSZydyZZYQ6",
+      "tiempo_llm_s": 27.0,
+      "tokens": {
+        "input": 28,
+        "output": 2996,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0669,
+      "lineas_agregadas": 15,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "environment_run3",
+      "modulo": "environment",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5BfvtJa7Puw7HHy4nSS",
+      "tiempo_llm_s": 29.8,
+      "tokens": {
+        "input": 28,
+        "output": 3494,
+        "cache_write": 34562,
+        "cache_read": 0
+      },
+      "costo_usd": 0.2428,
+      "intentos": 1,
+      "lineas_agregadas": 17,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "exceptions_run1",
+      "modulo": "exceptions",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DQaToGVXKyYtvkvsYS",
+      "tiempo_llm_s": 42.7,
+      "tokens": {
+        "input": 30,
+        "output": 4856,
+        "cache_write": 34562,
+        "cache_read": 0
+      },
+      "costo_usd": 0.2701,
+      "intentos": 2,
+      "lineas_agregadas": 131,
+      "lineas_eliminadas": 102,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "exceptions_run2",
+      "modulo": "exceptions",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DTwiZJqT2ZNCRMY62a",
+      "tiempo_llm_s": 42.8,
+      "tokens": {
+        "input": 30,
+        "output": 4941,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1059,
+      "intentos": 1,
+      "lineas_agregadas": 137,
+      "lineas_eliminadas": 116,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "exceptions_run3",
+      "modulo": "exceptions",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DXL8nFGrDft3S2gGRX",
+      "tiempo_llm_s": 38.5,
+      "tokens": {
+        "input": 30,
+        "output": 4500,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.097,
+      "intentos": 1,
+      "lineas_agregadas": 138,
+      "lineas_eliminadas": 116,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "extensions_run1",
+      "modulo": "extensions",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DaRM9Kggq7EE93Ss59",
+      "tiempo_llm_s": 44.5,
+      "tokens": {
+        "input": 29,
+        "output": 5522,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1175,
+      "intentos": 1,
+      "lineas_agregadas": 48,
+      "lineas_eliminadas": 33,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "extensions_run2",
+      "modulo": "extensions",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5Ddy4hVgjQhLZkkaZLe",
+      "tiempo_llm_s": 55.8,
+      "tokens": {
+        "input": 29,
+        "output": 6679,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1406,
+      "intentos": 1,
+      "lineas_agregadas": 66,
+      "lineas_eliminadas": 45,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "extensions_run3",
+      "modulo": "extensions",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DiK2cU3bh5uwJDvnvb",
+      "tiempo_llm_s": 55.3,
+      "tokens": {
+        "input": 29,
+        "output": 6825,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1435,
+      "intentos": 1,
+      "lineas_agregadas": 115,
+      "lineas_eliminadas": 92,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "find_run1",
+      "modulo": "find",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DneqapCpoL9uiEuK38",
+      "tiempo_llm_s": 22.3,
+      "tokens": {
+        "input": 27,
+        "output": 2598,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.059,
+      "intentos": 1,
+      "lineas_agregadas": 31,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "find_run2",
+      "modulo": "find",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5DpYg4nFeNTG6yWzoCD",
+      "tiempo_llm_s": 17.7,
+      "tokens": {
+        "input": 27,
+        "output": 1981,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0466,
+      "intentos": 1,
+      "lineas_agregadas": 28,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "find_run3",
+      "modulo": "find",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5Dr5nrThy8ezyUq9Bgx",
+      "tiempo_llm_s": 23.0,
+      "tokens": {
+        "input": 27,
+        "output": 2577,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0586,
+      "intentos": 1,
+      "lineas_agregadas": 33,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "generate_run1",
+      "modulo": "generate",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5Dt1mK4YFApfMXNc9wj",
+      "tiempo_llm_s": 107.8,
+      "tokens": {
+        "input": 28,
+        "output": 14466,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.2963,
+      "intentos": 1,
+      "lineas_agregadas": 262,
+      "lineas_eliminadas": 165,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "generate_run2",
+      "modulo": "generate",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5E2AUfHCu6i2yYuXhAf",
+      "tiempo_llm_s": 106.9,
+      "tokens": {
+        "input": 28,
+        "output": 14407,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.2952,
+      "intentos": 1,
+      "lineas_agregadas": 283,
+      "lineas_eliminadas": 171,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "generate_run3",
+      "modulo": "generate",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EAERWwEKcQfgEmaqJc",
+      "tiempo_llm_s": 109.0,
+      "tokens": {
+        "input": 28,
+        "output": 14607,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.2992,
+      "intentos": 1,
+      "lineas_agregadas": 292,
+      "lineas_eliminadas": 178,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "hooks_run1",
+      "modulo": "hooks",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EJUmhPNFnBZaMBVrNi",
+      "tiempo_llm_s": 49.6,
+      "tokens": {
+        "input": 29,
+        "output": 6129,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1296,
+      "intentos": 1,
+      "lineas_agregadas": 56,
+      "lineas_eliminadas": 43,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "hooks_run2",
+      "modulo": "hooks",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5ENZe1CVwmJPAFUXN8K",
+      "tiempo_llm_s": 55.8,
+      "tokens": {
+        "input": 29,
+        "output": 6986,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1467,
+      "intentos": 1,
+      "lineas_agregadas": 65,
+      "lineas_eliminadas": 44,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "hooks_run3",
+      "modulo": "hooks",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5ESsqzZAUmqCmjZfths",
+      "tiempo_llm_s": 52.8,
+      "tokens": {
+        "input": 29,
+        "output": 6652,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1401,
+      "intentos": 1,
+      "lineas_agregadas": 56,
+      "lineas_eliminadas": 38,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "log_run1",
+      "modulo": "log",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EWyL1JmjxcZxbgyNQy",
+      "tiempo_llm_s": 25.5,
+      "tokens": {
+        "input": 27,
+        "output": 2906,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0651,
+      "intentos": 1,
+      "lineas_agregadas": 23,
+      "lineas_eliminadas": 17,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "log_run2",
+      "modulo": "log",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EZ6RwcDP8GomBnqDYq",
+      "tiempo_llm_s": 25.3,
+      "tokens": {
+        "input": 27,
+        "output": 2839,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0638,
+      "intentos": 1,
+      "lineas_agregadas": 22,
+      "lineas_eliminadas": 18,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "log_run3",
+      "modulo": "log",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5Eb9ubTB17bFRPfxxmR",
+      "tiempo_llm_s": 24.9,
+      "tokens": {
+        "input": 27,
+        "output": 2966,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0663,
+      "intentos": 1,
+      "lineas_agregadas": 30,
+      "lineas_eliminadas": 18,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "main_run1",
+      "modulo": "main",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EdB3sfWsXt1wK8xa1N",
+      "tiempo_llm_s": 84.0,
+      "tokens": {
+        "input": 27,
+        "output": 10652,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.2201,
+      "intentos": 1,
+      "lineas_agregadas": 128,
+      "lineas_eliminadas": 56,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "main_run2",
+      "modulo": "main",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EjaPEcQQPsMCeCJVMd",
+      "tiempo_llm_s": 78.3,
+      "tokens": {
+        "input": 27,
+        "output": 9981,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.2066,
+      "intentos": 1,
+      "lineas_agregadas": 106,
+      "lineas_eliminadas": 56,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "main_run3",
+      "modulo": "main",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5EqXpNNgB7bvcuU6eGx",
+      "tiempo_llm_s": 93.5,
+      "tokens": {
+        "input": 27,
+        "output": 11751,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.242,
+      "intentos": 1,
+      "lineas_agregadas": 114,
+      "lineas_eliminadas": 54,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "prompt_run1",
+      "modulo": "prompt",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5Exo3rG8uztxzDQtbrX",
+      "tiempo_llm_s": 109.7,
+      "tokens": {
+        "input": 29,
+        "output": 13956,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.2861,
+      "intentos": 1,
+      "lineas_agregadas": 146,
+      "lineas_eliminadas": 112,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "prompt_run2",
+      "modulo": "prompt",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5F74iPwq26ErYiv3V3q",
+      "tiempo_llm_s": 117.9,
+      "tokens": {
+        "input": 29,
+        "output": 15062,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.3083,
+      "intentos": 1,
+      "lineas_agregadas": 166,
+      "lineas_eliminadas": 128,
+      "sin_cambios": false,
+      "cambios_api_publica": [
+        "eliminado import Iterator",
+        "eliminado import starmap"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "prompt_run3",
+      "modulo": "prompt",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FFy64spaTrb3jYbkz8",
+      "tiempo_llm_s": 167.4,
+      "tokens": {
+        "input": 29,
+        "output": 21086,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.4287,
+      "intentos": 1,
+      "lineas_agregadas": 190,
+      "lineas_eliminadas": 142,
+      "sin_cambios": false,
+      "cambios_api_publica": [
+        "eliminado import starmap"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "replay_run1",
+      "modulo": "replay",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FUWLM42mQTQQPvcb5X",
+      "tiempo_llm_s": 16.8,
+      "tokens": {
+        "input": 28,
+        "output": 1913,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0453,
+      "intentos": 1,
+      "lineas_agregadas": 19,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "replay_run2",
+      "modulo": "replay",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FVuxCC7AhbEJyKAhmY",
+      "tiempo_llm_s": 23.7,
+      "tokens": {
+        "input": 28,
+        "output": 2840,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0638,
+      "intentos": 1,
+      "lineas_agregadas": 40,
+      "lineas_eliminadas": 15,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "replay_run3",
+      "modulo": "replay",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FXwvpDGqvJoP6kfJJh",
+      "tiempo_llm_s": 17.8,
+      "tokens": {
+        "input": 28,
+        "output": 1980,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0466,
+      "intentos": 1,
+      "lineas_agregadas": 15,
+      "lineas_eliminadas": 9,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "repository_run1",
+      "modulo": "repository",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FZX39yMU9EFBp5s9sM",
+      "tiempo_llm_s": 48.8,
+      "tokens": {
+        "input": 28,
+        "output": 4279,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0926,
+      "intentos": 1,
+      "lineas_agregadas": 61,
+      "lineas_eliminadas": 33,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "repository_run2",
+      "modulo": "repository",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FdMJ8s6rQgibvAz2x5",
+      "tiempo_llm_s": 38.2,
+      "tokens": {
+        "input": 28,
+        "output": 4090,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0888,
+      "intentos": 1,
+      "lineas_agregadas": 56,
+      "lineas_eliminadas": 28,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "repository_run3",
+      "modulo": "repository",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FgNXPZSNCAzaCk7dSU",
+      "tiempo_llm_s": 33.8,
+      "tokens": {
+        "input": 28,
+        "output": 4040,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0878,
+      "intentos": 1,
+      "lineas_agregadas": 52,
+      "lineas_eliminadas": 34,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "utils_run1",
+      "modulo": "utils",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FjBBbES9Dn95ZrVVrS",
+      "tiempo_llm_s": 33.6,
+      "tokens": {
+        "input": 28,
+        "output": 3982,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0867,
+      "intentos": 1,
+      "lineas_agregadas": 19,
+      "lineas_eliminadas": 14,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "utils_run2",
+      "modulo": "utils",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FmrEQ9WFq58xQ4dFqC",
+      "tiempo_llm_s": 35.1,
+      "tokens": {
+        "input": 28,
+        "output": 4126,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.0895,
+      "intentos": 1,
+      "lineas_agregadas": 21,
+      "lineas_eliminadas": 14,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "utils_run3",
+      "modulo": "utils",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5Fpj9qgEKwkprnAxqR5",
+      "tiempo_llm_s": 47.7,
+      "tokens": {
+        "input": 28,
+        "output": 5579,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1186,
+      "intentos": 1,
+      "lineas_agregadas": 17,
+      "lineas_eliminadas": 13,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "vcs_run1",
+      "modulo": "vcs",
+      "corrida": 1,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FtT2aiy2mRfNDL6grQ",
+      "tiempo_llm_s": 51.8,
+      "tokens": {
+        "input": 29,
+        "output": 6116,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1293,
+      "intentos": 1,
+      "lineas_agregadas": 90,
+      "lineas_eliminadas": 52,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "vcs_run2",
+      "modulo": "vcs",
+      "corrida": 2,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5FxTNXXwsLp31kXJAbZ",
+      "tiempo_llm_s": 66.5,
+      "tokens": {
+        "input": 29,
+        "output": 8204,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1711,
+      "intentos": 1,
+      "lineas_agregadas": 84,
+      "lineas_eliminadas": 52,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "vcs_run3",
+      "modulo": "vcs",
+      "corrida": 3,
+      "modelo_respuesta": "claude-opus-5-5",
+      "stop_reason": "end_turn",
+      "message_id": "msg_011Cg5G6ay9pKzEwzx7oVDk9",
+      "tiempo_llm_s": 59.2,
+      "tokens": {
+        "input": 29,
+        "output": 7328,
+        "cache_write": 0,
+        "cache_read": 34562
+      },
+      "costo_usd": 0.1536,
+      "intentos": 1,
+      "lineas_agregadas": 94,
+      "lineas_eliminadas": 55,
+      "sin_cambios": false,
+      "cambios_api_publica": [],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    }
+  ]
+}

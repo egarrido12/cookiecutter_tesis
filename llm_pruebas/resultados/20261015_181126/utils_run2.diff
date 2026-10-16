@@ -1,0 +1,79 @@
+--- a/cookiecutter/utils.py
++++ b/cookiecutter/utils.py
+@@ -20,6 +20,9 @@
+     from jinja2 import Environment
+ 
+ logger = logging.getLogger(__name__)
++
++# Template context key holding extra keyword arguments for the Jinja2 environment.
++_JINJA2_ENV_VARS_KEY = '_jinja2_env_vars'
+ 
+ 
+ def force_delete(func, path, _exc_info) -> None:  # type: ignore[no-untyped-def]
+@@ -59,13 +62,13 @@
+ 
+     When exited, returns to the working directory prior to entering.
+     """
+-    curdir = os.getcwd()
++    previous_dir = os.getcwd()
+     try:
+         if dirname is not None:
+             os.chdir(dirname)
+         yield
+     finally:
+-        os.chdir(curdir)
++        os.chdir(previous_dir)
+ 
+ 
+ def make_executable(script_path: Path | str) -> None:
+@@ -73,34 +76,38 @@
+ 
+     :param script_path: The file to change
+     """
+-    status = os.stat(script_path)
+-    os.chmod(script_path, status.st_mode | stat.S_IEXEC)
++    current_mode = os.stat(script_path).st_mode
++    os.chmod(script_path, current_mode | stat.S_IEXEC)
+ 
+ 
+ def simple_filter(filter_function) -> type[Extension]:  # type: ignore[no-untyped-def]
+     """Decorate a function to wrap it in a simplified jinja2 extension."""
++    filter_name = filter_function.__name__
+ 
+     class SimpleFilterExtension(Extension):
+         def __init__(self, environment: Environment) -> None:
+             super().__init__(environment)
+-            environment.filters[filter_function.__name__] = filter_function
++            environment.filters[filter_name] = filter_function
+ 
+-    SimpleFilterExtension.__name__ = filter_function.__name__
++    SimpleFilterExtension.__name__ = filter_name
+     return SimpleFilterExtension
+ 
+ 
+ def create_tmp_repo_dir(repo_dir: Path | str) -> Path:
+     """Create a temporary dir with a copy of the contents of repo_dir."""
+-    repo_dir = Path(repo_dir).resolve()
+-    base_dir = tempfile.mkdtemp(prefix='cookiecutter')
+-    new_dir = f"{base_dir}/{repo_dir.name}"
+-    logger.debug(f'Copying repo_dir from {repo_dir} to {new_dir}')
+-    shutil.copytree(repo_dir, new_dir)
+-    return Path(new_dir)
++    source_repo_dir = Path(repo_dir).resolve()
++    tmp_base_dir = tempfile.mkdtemp(prefix='cookiecutter')
++    tmp_repo_dir = f"{tmp_base_dir}/{source_repo_dir.name}"
++    logger.debug('Copying repo_dir from %s to %s', source_repo_dir, tmp_repo_dir)
++    shutil.copytree(source_repo_dir, tmp_repo_dir)
++    return Path(tmp_repo_dir)
+ 
+ 
+ def create_env_with_context(context: dict[str, Any]) -> StrictEnvironment:
+     """Create a jinja environment using the provided context."""
+-    envvars = context.get('cookiecutter', {}).get('_jinja2_env_vars', {})
++    cookiecutter_context = context.get('cookiecutter', {})
++    jinja2_env_vars = cookiecutter_context.get(_JINJA2_ENV_VARS_KEY, {})
+ 
+-    return StrictEnvironment(context=context, keep_trailing_newline=True, **envvars)
++    return StrictEnvironment(
++        context=context, keep_trailing_newline=True, **jinja2_env_vars
++    )
