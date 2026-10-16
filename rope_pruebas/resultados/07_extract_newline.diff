@@ -1,0 +1,40 @@
+Extract method <_detect_newline> - today 18:13:35 :
+
+
+--- a/cookiecutter/generate.py
++++ b/cookiecutter/generate.py
+@@ -238,6 +238,17 @@
+         raise
+     rendered_file = tmpl.render(**context)
+ 
++    newline = _detect_newline(context, infile)
++
++    logger.debug('Writing contents to file %s', outfile)
++
++    with open(outfile, 'w', encoding='utf-8', newline=newline) as fh:
++        fh.write(rendered_file)
++
++    # Apply file permissions to output file
++    shutil.copymode(infile, outfile)
++
++def _detect_newline(context, infile):
+     if context['cookiecutter'].get('_new_lines', False):
+         # Use `_new_lines` from context, if configured.
+         newline = context['cookiecutter']['_new_lines']
+@@ -250,14 +261,7 @@
+             rd.readline()  # Read only the first line to load a 'newlines' value.
+         newline = rd.newlines[0] if isinstance(rd.newlines, tuple) else rd.newlines
+         logger.debug('Using detected newline character %s', repr(newline))
+-
+-    logger.debug('Writing contents to file %s', outfile)
+-
+-    with open(outfile, 'w', encoding='utf-8', newline=newline) as fh:
+-        fh.write(rendered_file)
+-
+-    # Apply file permissions to output file
+-    shutil.copymode(infile, outfile)
++    return newline
+ 
+ 
+ def render_and_create_dir(
+

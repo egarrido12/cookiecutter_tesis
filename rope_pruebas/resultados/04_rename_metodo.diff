@@ -1,0 +1,24 @@
+Renaming <_read_extensions> to <_extensions_from_context> - today 18:13:26 :
+
+
+--- a/cookiecutter/environment.py
++++ b/cookiecutter/environment.py
+@@ -34,7 +34,7 @@
+             'cookiecutter.extensions.TimeExtension',
+             'cookiecutter.extensions.UUIDExtension',
+         ]
+-        extensions = default_extensions + self._read_extensions(context)
++        extensions = default_extensions + self._extensions_from_context(context)
+ 
+         try:
+             super().__init__(extensions=extensions, **kwargs)  # type: ignore[call-arg]
+@@ -42,7 +42,7 @@
+             msg = f'Unable to load extension: {err}'
+             raise UnknownExtension(msg) from err
+ 
+-    def _read_extensions(self, context: dict[str, Any]) -> list[str]:
++    def _extensions_from_context(self, context: dict[str, Any]) -> list[str]:
+         """Return list of extensions as str to be passed on to the Jinja2 env.
+ 
+         If context does not contain the relevant info, return an empty
+

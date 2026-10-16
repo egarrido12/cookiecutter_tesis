@@ -1,0 +1,33 @@
+Renaming <is_vcs_installed> to <is_vcs_available> - today 18:13:52 :
+
+
+--- a/tests/vcs/test_is_vcs_installed.py
++++ b/tests/vcs/test_is_vcs_installed.py
+@@ -12,4 +12,4 @@
+ def test_is_vcs_installed(mocker, which_return, result) -> None:
+     """Verify `is_vcs_installed` function correctly handles `which` answer."""
+     mocker.patch('cookiecutter.vcs.which', autospec=True, return_value=which_return)
+-    assert vcs.is_vcs_installed('git') == result
++    assert vcs.is_vcs_available('git') == result
+
+--- a/cookiecutter/vcs.py
++++ b/cookiecutter/vcs.py
+@@ -51,7 +51,7 @@
+     raise UnknownRepoType
+ 
+ 
+-def is_vcs_installed(repo_type: str) -> bool:
++def is_vcs_available(repo_type: str) -> bool:
+     """
+     Check if the version control system for a repo type is installed.
+ 
+@@ -84,7 +84,7 @@
+     repo_type, repo_url = identify_repo(repo_url)
+ 
+     # check that the appropriate VCS for the repo_type is installed
+-    if not is_vcs_installed(repo_type):
++    if not is_vcs_available(repo_type):
+         msg = f"'{repo_type}' is not installed."
+         raise VCSNotInstalled(msg)
+ 
+

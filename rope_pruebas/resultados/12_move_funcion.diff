@@ -1,0 +1,59 @@
+Moving global <make_executable> - today 18:13:46 :
+
+
+--- a/cookiecutter/utils.py
++++ b/cookiecutter/utils.py
+@@ -68,15 +68,6 @@
+         os.chdir(curdir)
+ 
+ 
+-def make_executable(script_path: Path | str) -> None:
+-    """Make `script_path` executable.
+-
+-    :param script_path: The file to change
+-    """
+-    status = os.stat(script_path)
+-    os.chmod(script_path, status.st_mode | stat.S_IEXEC)
+-
+-
+ def simple_filter(filter_function) -> type[Extension]:  # type: ignore[no-untyped-def]
+     """Decorate a function to wrap it in a simplified jinja2 extension."""
+ 
+
+--- a/cookiecutter/hooks.py
++++ b/cookiecutter/hooks.py
+@@ -13,7 +13,6 @@
+ 
+ from jinja2.exceptions import UndefinedError
+ 
+-from cookiecutter import utils
+ from cookiecutter.exceptions import FailedHookException
+ from cookiecutter.utils import (
+     create_env_with_context,
+@@ -21,6 +20,16 @@
+     rmtree,
+     work_in,
+ )
++import stat
++
++
++def make_executable(script_path: Path | str) -> None:
++    """Make `script_path` executable.
++
++    :param script_path: The file to change
++    """
++    status = os.stat(script_path)
++    os.chmod(script_path, status.st_mode | stat.S_IEXEC)
+ 
+ logger = logging.getLogger(__name__)
+ 
+@@ -89,7 +98,7 @@
+     else:
+         script_command = [script_path]
+ 
+-    utils.make_executable(script_path)
++    make_executable(script_path)
+ 
+     try:
+         proc = subprocess.Popen(script_command, shell=run_thru_shell, cwd=cwd)  # nosec
+

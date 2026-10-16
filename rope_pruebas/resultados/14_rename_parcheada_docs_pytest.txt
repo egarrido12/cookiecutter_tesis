@@ -1,0 +1,564 @@
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+.....................................................s.................. [ 56%]
+....................................................................sss. [ 75%]
+.................................................FFFFFFFFF.............. [ 93%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+_________________ test_clone_should_raise_if_vcs_not_installed _________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10857e420>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_raise_if_vcs0/clone_dir')
+
+    def test_clone_should_raise_if_vcs_not_installed(mocker, clone_dir) -> None:
+        """In `clone()`, a `VCSNotInstalled` exception should be raised if no VCS \
+        is installed."""
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=False)
+
+tests/vcs/test_clone.py:14: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x1085ceff0>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+_____________ test_clone_should_rstrip_trailing_slash_in_repo_url ______________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10857d340>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_rstrip_trail0/clone_dir')
+
+    def test_clone_should_rstrip_trailing_slash_in_repo_url(mocker, clone_dir) -> None:
+        """In `clone()`, repo URL's trailing slash should be stripped if one is \
+        present."""
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x10857e000>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+___________ test_clone_should_abort_if_user_does_not_want_to_reclone ___________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10850e2d0>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_abort_if_use0/clone_dir')
+
+    def test_clone_should_abort_if_user_does_not_want_to_reclone(mocker, clone_dir) -> None:
+        """In `clone()`, if user doesn't want to reclone, Cookiecutter should exit \
+        without cloning anything."""
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x10850d340>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+_________________ test_clone_should_silent_exit_if_ok_to_reuse _________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10850ed80>
+tmpdir = local('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_silent_exit_0')
+
+    def test_clone_should_silent_exit_if_ok_to_reuse(mocker, tmpdir) -> None:
+        """In `clone()`, if user doesn't want to reclone, Cookiecutter should exit \
+        without cloning anything."""
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x10850ff50>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+_ test_clone_should_invoke_vcs_command[git-https://github.com/hello/world.git-world] _
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x108754350>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_invoke_vcs_c0/clone_dir')
+repo_type = 'git', repo_url = 'https://github.com/hello/world.git'
+repo_name = 'world'
+
+    @pytest.mark.parametrize(
+        'repo_type, repo_url, repo_name',
+        [
+            ('git', 'https://github.com/hello/world.git', 'world'),
+            ('hg', 'https://bitbucket.org/foo/bar', 'bar'),
+            ('git', 'git@host:gitoliterepo', 'gitoliterepo'),
+            ('git', 'git@gitlab.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+            ('git', 'git@github.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+        ],
+    )
+    def test_clone_should_invoke_vcs_command(
+        mocker, clone_dir, repo_type, repo_url, repo_name
+    ) -> None:
+        """When `clone()` is called with a git/hg repo, the corresponding VCS \
+        command should be run via `subprocess.check_output()`.
+    
+        This should take place:
+        * In the correct dir
+        * With the correct args.
+        """
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x108754530>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+__ test_clone_should_invoke_vcs_command[hg-https://bitbucket.org/foo/bar-bar] __
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x108768ad0>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_invoke_vcs_c1/clone_dir')
+repo_type = 'hg', repo_url = 'https://bitbucket.org/foo/bar', repo_name = 'bar'
+
+    @pytest.mark.parametrize(
+        'repo_type, repo_url, repo_name',
+        [
+            ('git', 'https://github.com/hello/world.git', 'world'),
+            ('hg', 'https://bitbucket.org/foo/bar', 'bar'),
+            ('git', 'git@host:gitoliterepo', 'gitoliterepo'),
+            ('git', 'git@gitlab.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+            ('git', 'git@github.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+        ],
+    )
+    def test_clone_should_invoke_vcs_command(
+        mocker, clone_dir, repo_type, repo_url, repo_name
+    ) -> None:
+        """When `clone()` is called with a git/hg repo, the corresponding VCS \
+        command should be run via `subprocess.check_output()`.
+    
+        This should take place:
+        * In the correct dir
+        * With the correct args.
+        """
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x1087691f0>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+_ test_clone_should_invoke_vcs_command[git-git@host:gitoliterepo-gitoliterepo] _
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x1087540e0>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_invoke_vcs_c2/clone_dir')
+repo_type = 'git', repo_url = 'git@host:gitoliterepo'
+repo_name = 'gitoliterepo'
+
+    @pytest.mark.parametrize(
+        'repo_type, repo_url, repo_name',
+        [
+            ('git', 'https://github.com/hello/world.git', 'world'),
+            ('hg', 'https://bitbucket.org/foo/bar', 'bar'),
+            ('git', 'git@host:gitoliterepo', 'gitoliterepo'),
+            ('git', 'git@gitlab.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+            ('git', 'git@github.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+        ],
+    )
+    def test_clone_should_invoke_vcs_command(
+        mocker, clone_dir, repo_type, repo_url, repo_name
+    ) -> None:
+        """When `clone()` is called with a git/hg repo, the corresponding VCS \
+        command should be run via `subprocess.check_output()`.
+    
+        This should take place:
+        * In the correct dir
+        * With the correct args.
+        """
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x108754a40>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+_ test_clone_should_invoke_vcs_command[git-git@gitlab.com:cookiecutter/cookiecutter.git-cookiecutter] _
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10850ca40>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_invoke_vcs_c3/clone_dir')
+repo_type = 'git', repo_url = 'git@gitlab.com:cookiecutter/cookiecutter.git'
+repo_name = 'cookiecutter'
+
+    @pytest.mark.parametrize(
+        'repo_type, repo_url, repo_name',
+        [
+            ('git', 'https://github.com/hello/world.git', 'world'),
+            ('hg', 'https://bitbucket.org/foo/bar', 'bar'),
+            ('git', 'git@host:gitoliterepo', 'gitoliterepo'),
+            ('git', 'git@gitlab.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+            ('git', 'git@github.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+        ],
+    )
+    def test_clone_should_invoke_vcs_command(
+        mocker, clone_dir, repo_type, repo_url, repo_name
+    ) -> None:
+        """When `clone()` is called with a git/hg repo, the corresponding VCS \
+        command should be run via `subprocess.check_output()`.
+    
+        This should take place:
+        * In the correct dir
+        * With the correct args.
+        """
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x10850d4c0>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+_ test_clone_should_invoke_vcs_command[git-git@github.com:cookiecutter/cookiecutter.git-cookiecutter] _
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10876a0f0>
+clone_dir = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-51/test_clone_should_invoke_vcs_c4/clone_dir')
+repo_type = 'git', repo_url = 'git@github.com:cookiecutter/cookiecutter.git'
+repo_name = 'cookiecutter'
+
+    @pytest.mark.parametrize(
+        'repo_type, repo_url, repo_name',
+        [
+            ('git', 'https://github.com/hello/world.git', 'world'),
+            ('hg', 'https://bitbucket.org/foo/bar', 'bar'),
+            ('git', 'git@host:gitoliterepo', 'gitoliterepo'),
+            ('git', 'git@gitlab.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+            ('git', 'git@github.com:cookiecutter/cookiecutter.git', 'cookiecutter'),
+        ],
+    )
+    def test_clone_should_invoke_vcs_command(
+        mocker, clone_dir, repo_type, repo_url, repo_name
+    ) -> None:
+        """When `clone()` is called with a git/hg repo, the corresponding VCS \
+        command should be run via `subprocess.check_output()`.
+    
+        This should take place:
+        * In the correct dir
+        * With the correct args.
+        """
+>       mocker.patch('cookiecutter.vcs.is_vcs_installed', autospec=True, return_value=True)
+
+tests/vcs/test_clone.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:439: in __call__
+    return self._start_patch(
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:257: in _start_patch
+    mocked: MockType = p.start()
+                       ^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1624: in start
+    result = self.__enter__()
+             ^^^^^^^^^^^^^^^^
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1467: in __enter__
+    original, local = self.get_original()
+                      ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <unittest.mock._patch object at 0x10876a570>
+
+    def get_original(self):
+        target = self.getter()
+        name = self.attribute
+    
+        original = DEFAULT
+        local = False
+    
+        try:
+            original = target.__dict__[name]
+        except (AttributeError, KeyError):
+            original = getattr(target, name, DEFAULT)
+        else:
+            local = True
+    
+        if name in _builtins and isinstance(target, ModuleType):
+            self.create = True
+    
+        if not self.create and original is DEFAULT:
+>           raise AttributeError(
+                "%s does not have the attribute %r" % (target, name)
+            )
+E           AttributeError: <module 'cookiecutter.vcs' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/14_rename_parcheada_docs/cookiecutter/vcs.py'> does not have the attribute 'is_vcs_installed'
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/unittest/mock.py:1437: AttributeError
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_generate_hooks.py:195: Win only test
+SKIPPED [3] tests/test_prompt.py:640: Win only test
+9 failed, 370 passed, 4 skipped in 2.45s

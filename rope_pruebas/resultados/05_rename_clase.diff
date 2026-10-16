@@ -1,0 +1,168 @@
+Renaming <CookiecutterException> to <CookiecutterError> - today 18:13:30 :
+
+
+--- a/cookiecutter/exceptions.py
++++ b/cookiecutter/exceptions.py
+@@ -8,7 +8,7 @@
+     from jinja2 import TemplateError
+ 
+ 
+-class CookiecutterException(Exception):
++class CookiecutterError(Exception):
+     """
+     Base exception class.
+ 
+@@ -16,7 +16,7 @@
+     """
+ 
+ 
+-class NonTemplatedInputDirException(CookiecutterException):
++class NonTemplatedInputDirException(CookiecutterError):
+     """
+     Exception for when a project's input dir is not templated.
+ 
+@@ -25,7 +25,7 @@
+     """
+ 
+ 
+-class UnknownTemplateDirException(CookiecutterException):
++class UnknownTemplateDirException(CookiecutterError):
+     """
+     Exception for ambiguous project template directory.
+ 
+@@ -36,7 +36,7 @@
+     # unused locally
+ 
+ 
+-class MissingProjectDir(CookiecutterException):
++class MissingProjectDir(CookiecutterError):
+     """
+     Exception for missing generated project directory.
+ 
+@@ -47,7 +47,7 @@
+     # unused locally
+ 
+ 
+-class ConfigDoesNotExistException(CookiecutterException):
++class ConfigDoesNotExistException(CookiecutterError):
+     """
+     Exception for missing config file.
+ 
+@@ -56,7 +56,7 @@
+     """
+ 
+ 
+-class InvalidConfiguration(CookiecutterException):
++class InvalidConfiguration(CookiecutterError):
+     """
+     Exception for invalid configuration file.
+ 
+@@ -65,7 +65,7 @@
+     """
+ 
+ 
+-class UnknownRepoType(CookiecutterException):
++class UnknownRepoType(CookiecutterError):
+     """
+     Exception for unknown repo types.
+ 
+@@ -73,7 +73,7 @@
+     """
+ 
+ 
+-class VCSNotInstalled(CookiecutterException):
++class VCSNotInstalled(CookiecutterError):
+     """
+     Exception when version control is unavailable.
+ 
+@@ -81,7 +81,7 @@
+     """
+ 
+ 
+-class ContextDecodingException(CookiecutterException):
++class ContextDecodingException(CookiecutterError):
+     """
+     Exception for failed JSON decoding.
+ 
+@@ -89,7 +89,7 @@
+     """
+ 
+ 
+-class OutputDirExistsException(CookiecutterException):
++class OutputDirExistsException(CookiecutterError):
+     """
+     Exception for existing output directory.
+ 
+@@ -97,7 +97,7 @@
+     """
+ 
+ 
+-class EmptyDirNameException(CookiecutterException):
++class EmptyDirNameException(CookiecutterError):
+     """
+     Exception for a empty directory name.
+ 
+@@ -105,7 +105,7 @@
+     """
+ 
+ 
+-class InvalidModeException(CookiecutterException):
++class InvalidModeException(CookiecutterError):
+     """
+     Exception for incompatible modes.
+ 
+@@ -114,7 +114,7 @@
+     """
+ 
+ 
+-class FailedHookException(CookiecutterException):
++class FailedHookException(CookiecutterError):
+     """
+     Exception for hook failures.
+ 
+@@ -122,7 +122,7 @@
+     """
+ 
+ 
+-class UndefinedVariableInTemplate(CookiecutterException):
++class UndefinedVariableInTemplate(CookiecutterError):
+     """
+     Exception for out-of-scope variables.
+ 
+@@ -147,7 +147,7 @@
+         )
+ 
+ 
+-class UnknownExtension(CookiecutterException):
++class UnknownExtension(CookiecutterError):
+     """
+     Exception for un-importable extension.
+ 
+@@ -155,7 +155,7 @@
+     """
+ 
+ 
+-class RepositoryNotFound(CookiecutterException):
++class RepositoryNotFound(CookiecutterError):
+     """
+     Exception for missing repo.
+ 
+@@ -163,7 +163,7 @@
+     """
+ 
+ 
+-class RepositoryCloneFailed(CookiecutterException):
++class RepositoryCloneFailed(CookiecutterError):
+     """
+     Exception for un-cloneable repo.
+ 
+@@ -171,7 +171,7 @@
+     """
+ 
+ 
+-class InvalidZipRepository(CookiecutterException):
++class InvalidZipRepository(CookiecutterError):
+     """
+     Exception for bad zip repo.
+ 
+

@@ -1,0 +1,94 @@
+..F..F.................................................................. [ 18%]
+........................................................................ [ 37%]
+.....................................................s.................. [ 56%]
+....................................................................sss. [ 75%]
+........................................................................ [ 93%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+______________________________ test_run_json_dump ______________________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x102e45eb0>
+mock_ensure_success = <MagicMock name='make_sure_path_exists' id='4352966784'>
+mock_user_config = <MagicMock name='get_user_config' id='4352970720'>
+template_name = 'cookiedozer'
+context = {'cookiecutter': {'email': 'raphael@hackebrot.de', 'full_name': 'Raphael Pierzina', 'github_username': 'hackebrot', 'version': '0.1.0'}}
+replay_test_dir = 'tests/test-replay/'
+replay_file = 'tests/test-replay/cookiedozer.json'
+
+    def test_run_json_dump(
+        mocker,
+        mock_ensure_success,
+        mock_user_config,
+        template_name,
+        context,
+        replay_test_dir,
+        replay_file,
+    ) -> None:
+        """Test that replay.dump runs json.dump under the hood and that the context \
+        is correctly written to the expected file in the replay_dir."""
+>       spy_get_replay_file = mocker.spy(replay, 'get_file_name')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/replay/test_dump.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <pytest_mock.plugin.MockerFixture object at 0x102e45eb0>
+obj = <module 'cookiecutter.replay' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/15_rename_espiada/cookiecutter/replay.py'>
+name = 'get_file_name'
+
+    def spy(self, obj: object, name: str) -> MockType:
+        """
+        Create a spy of method. It will run method normally, but it is now
+        possible to use `mock` call features with it, like call count.
+    
+        :param obj: An object.
+        :param name: A method in object.
+        :return: Spy object.
+        """
+>       method = getattr(obj, name)
+                 ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'cookiecutter.replay' has no attribute 'get_file_name'
+
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:170: AttributeError
+______________________________ test_run_json_load ______________________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x103402c30>
+mock_user_config = <MagicMock name='get_user_config' id='4349502784'>
+template_name = 'cookiedozer_load'
+context = {'cookiecutter': {'email': 'raphael@hackebrot.de', 'full_name': 'Raphael Pierzina', 'github_username': 'hackebrot', 'version': '0.1.0'}}
+replay_test_dir = 'tests/test-replay/'
+replay_file = 'tests/test-replay/cookiedozer_load.json'
+
+    def test_run_json_load(
+        mocker, mock_user_config, template_name, context, replay_test_dir, replay_file
+    ) -> None:
+        """Test that replay.load runs json.load under the hood and that the context \
+        is correctly loaded from the file in replay_dir."""
+>       spy_get_replay_file = mocker.spy(replay, 'get_file_name')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/replay/test_load.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <pytest_mock.plugin.MockerFixture object at 0x103402c30>
+obj = <module 'cookiecutter.replay' from '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/15_rename_espiada/cookiecutter/replay.py'>
+name = 'get_file_name'
+
+    def spy(self, obj: object, name: str) -> MockType:
+        """
+        Create a spy of method. It will run method normally, but it is now
+        possible to use `mock` call features with it, like call count.
+    
+        :param obj: An object.
+        :param name: A method in object.
+        :return: Spy object.
+        """
+>       method = getattr(obj, name)
+                 ^^^^^^^^^^^^^^^^^^
+E       AttributeError: module 'cookiecutter.replay' has no attribute 'get_file_name'
+
+../../../.venv/lib/python3.12/site-packages/pytest_mock/plugin.py:170: AttributeError
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_generate_hooks.py:195: Win only test
+SKIPPED [3] tests/test_prompt.py:640: Win only test
+2 failed, 377 passed, 4 skipped in 2.20s

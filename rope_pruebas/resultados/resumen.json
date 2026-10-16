@@ -1,0 +1,276 @@
+{
+  "python": "3.12.15",
+  "rope": "1.15.0",
+  "linea_base": {
+    "returncode": 0,
+    "passed": 379,
+    "failed": 0,
+    "skipped": 4,
+    "errors": 0
+  },
+  "analisis": {
+    "errores": 39,
+    "ocurrencias": {
+      "create_env_with_context": 10,
+      "expand_abbreviations": 7,
+      "_read_extensions": 2,
+      "CookiecutterException": 18,
+      "is_vcs_installed": 3
+    },
+    "definicion": "cookiecutter/utils.py:102"
+  },
+  "refactorizaciones": [
+    {
+      "id": "02_rename_funcion",
+      "tipo": "Rename",
+      "descripcion": "utils.create_env_with_context -> create_jinja_env (usada en 3 módulos y en tests)",
+      "tiempo_rope_s": 0.334,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/generate.py",
+        "cookiecutter/hooks.py",
+        "cookiecutter/prompt.py",
+        "cookiecutter/utils.py",
+        "tests/test_find.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "03_rename_funcion_importada",
+      "tipo": "Rename",
+      "descripcion": "repository.expand_abbreviations -> expand_template_abbreviations (también importada por los tests)",
+      "tiempo_rope_s": 0.069,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/repository.py",
+        "tests/repository/test_abbreviation_expansion.py",
+        "tests/repository/test_is_repo_url.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "04_rename_metodo",
+      "tipo": "Rename",
+      "descripcion": "ExtensionLoaderMixin._read_extensions -> _extensions_from_context",
+      "tiempo_rope_s": 0.039,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/environment.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "05_rename_clase",
+      "tipo": "Rename",
+      "descripcion": "exceptions.CookiecutterException -> CookiecutterError (clase base de 17 subclases)",
+      "tiempo_rope_s": 0.244,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/exceptions.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "06_rename_parametro",
+      "tipo": "Rename",
+      "descripcion": "parámetro cwd de hooks.run_script -> working_dir",
+      "tiempo_rope_s": 0.063,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/hooks.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "07_extract_newline",
+      "tipo": "Extract Method",
+      "descripcion": "bloque de detección de fin de línea de generate_file -> _detect_newline",
+      "tiempo_rope_s": 0.041,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/generate.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "08_extract_contexto",
+      "tipo": "Extract Method",
+      "descripcion": "bloque if/else que arma el contexto en main.cookiecutter -> _build_context (2 valores de salida)",
+      "tiempo_rope_s": 0.113,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/main.py"
+      ],
+      "tests": {
+        "returncode": 1,
+        "passed": 333,
+        "failed": 46,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "ROMPE TESTS"
+    },
+    {
+      "id": "09_extract_con_continue",
+      "tipo": "Extract Method",
+      "descripcion": "bloque que termina en `continue` dentro del for de generate_files -> _copy_file_without_rendering (caso límite)",
+      "tiempo_rope_s": 0.003,
+      "estado_rope": "error: RefactoringError: A break/continue without having a matching for/while loop.",
+      "veredicto": "RECHAZADA POR ROPE"
+    },
+    {
+      "id": "10_extract_bucle",
+      "tipo": "Extract Method",
+      "descripcion": "bucle de copia de directorios de generate_files -> _copy_dirs_without_rendering",
+      "tiempo_rope_s": 0.338,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/generate.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "11_inline_funcion",
+      "tipo": "Inline",
+      "descripcion": "inline de config._expand_path en get_config (2 llamadas)",
+      "tiempo_rope_s": 0.125,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/config.py"
+      ],
+      "tests": {
+        "returncode": 1,
+        "passed": 378,
+        "failed": 1,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "ROMPE TESTS"
+    },
+    {
+      "id": "12_move_funcion",
+      "tipo": "Move",
+      "descripcion": "mover utils.make_executable a hooks",
+      "tiempo_rope_s": 0.391,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/hooks.py",
+        "cookiecutter/utils.py"
+      ],
+      "tests": {
+        "returncode": 0,
+        "passed": 379,
+        "failed": 0,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "COMPORTAMIENTO PRESERVADO"
+    },
+    {
+      "id": "13_rename_parcheada",
+      "tipo": "Rename",
+      "descripcion": "vcs.is_vcs_installed -> is_vcs_available (los tests la parchean con mocker.patch('cookiecutter.vcs.is_vcs_installed'))",
+      "tiempo_rope_s": 0.094,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/vcs.py",
+        "tests/vcs/test_is_vcs_installed.py"
+      ],
+      "tests": {
+        "returncode": 1,
+        "passed": 370,
+        "failed": 9,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "ROMPE TESTS"
+    },
+    {
+      "id": "14_rename_parcheada_docs",
+      "tipo": "Rename",
+      "descripcion": "igual que 13 pero con docs=True (renombra también en strings y comentarios)",
+      "tiempo_rope_s": 0.093,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/vcs.py",
+        "tests/vcs/test_is_vcs_installed.py"
+      ],
+      "tests": {
+        "returncode": 1,
+        "passed": 370,
+        "failed": 9,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "ROMPE TESTS"
+    },
+    {
+      "id": "15_rename_espiada",
+      "tipo": "Rename",
+      "descripcion": "replay.get_file_name -> get_replay_file_path (los tests usan mocker.spy(replay, 'get_file_name'))",
+      "tiempo_rope_s": 0.375,
+      "estado_rope": "aplicada",
+      "archivos_modificados": [
+        "cookiecutter/replay.py",
+        "tests/replay/test_replay.py"
+      ],
+      "tests": {
+        "returncode": 1,
+        "passed": 377,
+        "failed": 2,
+        "skipped": 4,
+        "errors": 0
+      },
+      "veredicto": "ROMPE TESTS"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+Inline method <_expand_path> - today 18:13:43 :
+
+
+--- a/cookiecutter/config.py
++++ b/cookiecutter/config.py
+@@ -31,12 +31,6 @@
+     'default_context': collections.OrderedDict([]),
+     'abbreviations': BUILTIN_ABBREVIATIONS,
+ }
+-
+-
+-def _expand_path(path: str) -> str:
+-    """Expand both environment variables and user home in the given path."""
+-    path = os.path.expandvars(path)
+-    return os.path.expanduser(path)
+ 
+ 
+ def merge_configs(default: dict[str, Any], overwrite: dict[str, Any]) -> dict[str, Any]:
+@@ -78,10 +72,12 @@
+     config_dict = merge_configs(DEFAULT_CONFIG, yaml_dict)
+ 
+     raw_replay_dir = config_dict['replay_dir']
+-    config_dict['replay_dir'] = _expand_path(raw_replay_dir)
++    path = os.path.expandvars(raw_replay_dir)
++    config_dict['replay_dir'] = os.path.expanduser(raw_replay_dir)
+ 
+     raw_cookies_dir = config_dict['cookiecutters_dir']
+-    config_dict['cookiecutters_dir'] = _expand_path(raw_cookies_dir)
++    path = os.path.expandvars(raw_cookies_dir)
++    config_dict['cookiecutters_dir'] = os.path.expanduser(raw_cookies_dir)
+ 
+     return config_dict
+ 
+

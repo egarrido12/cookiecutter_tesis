@@ -1,0 +1,32 @@
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+.....................................................s.................. [ 56%]
+F...................................................................sss. [ 75%]
+........................................................................ [ 93%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+__________________ test_expand_vars_for_directories_in_config __________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1058a7230>
+
+    def test_expand_vars_for_directories_in_config(monkeypatch) -> None:
+        """Validate environment variables expanded in user configs."""
+        monkeypatch.setenv('COOKIES', 'Users/bob/cookies')
+    
+        config_file = 'tests/test-config/config-expand-vars.yaml'
+    
+        user_config = config.get_user_config(config_file)
+>       assert user_config['replay_dir'] == 'Users/bob/cookies/replay-files'
+E       AssertionError: assert '$COOKIES/replay-files' == 'Users/bob/co.../replay-files'
+E         
+E         - Users/bob/cookies/replay-files
+E         + $COOKIES/replay-files
+
+tests/test_get_user_config.py:156: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:118 Loading custom config from tests/test-config/config-expand-vars.yaml.
+DEBUG    cookiecutter.config:config.py:61 config_path is tests/test-config/config-expand-vars.yaml
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_generate_hooks.py:195: Win only test
+SKIPPED [3] tests/test_prompt.py:640: Win only test
+1 failed, 378 passed, 4 skipped in 2.21s

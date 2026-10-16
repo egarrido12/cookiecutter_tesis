@@ -1,0 +1,69 @@
+Renaming <expand_abbreviations> to <expand_template_abbreviations> - today 18:13:23 :
+
+
+--- a/tests/repository/test_abbreviation_expansion.py
++++ b/tests/repository/test_abbreviation_expansion.py
+@@ -3,7 +3,7 @@
+ import pytest
+ 
+ from cookiecutter.config import BUILTIN_ABBREVIATIONS
+-from cookiecutter.repository import expand_abbreviations
++from cookiecutter.repository import expand_template_abbreviations
+ 
+ 
+ @pytest.mark.parametrize(
+@@ -43,11 +43,11 @@
+ )
+ def test_abbreviation_expansion(template, abbreviations, expected_result) -> None:
+     """Verify abbreviation unpacking."""
+-    expanded = expand_abbreviations(template, abbreviations)
++    expanded = expand_template_abbreviations(template, abbreviations)
+     assert expanded == expected_result
+ 
+ 
+ def test_abbreviation_expansion_prefix_not_0_in_braces() -> None:
+     """Verify abbreviation unpacking raises error on incorrect index."""
+     with pytest.raises(IndexError):
+-        expand_abbreviations('xx:a', {'xx': '{1}'})
++        expand_template_abbreviations('xx:a', {'xx': '{1}'})
+
+--- a/tests/repository/test_is_repo_url.py
++++ b/tests/repository/test_is_repo_url.py
+@@ -3,7 +3,7 @@
+ import pytest
+ 
+ from cookiecutter.config import BUILTIN_ABBREVIATIONS
+-from cookiecutter.repository import expand_abbreviations, is_repo_url, is_zip_file
++from cookiecutter.repository import expand_template_abbreviations, is_repo_url, is_zip_file
+ 
+ 
+ @pytest.fixture(
+@@ -72,5 +72,5 @@
+     # First `repository.expand_abbreviations` needs to translate it
+     assert is_repo_url(template) is False
+ 
+-    expanded_template = expand_abbreviations(template, BUILTIN_ABBREVIATIONS)
++    expanded_template = expand_template_abbreviations(template, BUILTIN_ABBREVIATIONS)
+     assert is_repo_url(expanded_template) is True
+
+--- a/cookiecutter/repository.py
++++ b/cookiecutter/repository.py
+@@ -35,7 +35,7 @@
+     return value.lower().endswith('.zip')
+ 
+ 
+-def expand_abbreviations(template: str, abbreviations: dict[str, str]) -> str:
++def expand_template_abbreviations(template: str, abbreviations: dict[str, str]) -> str:
+     """Expand abbreviations in a template name.
+ 
+     :param template: The project template name.
+@@ -98,7 +98,7 @@
+         after the template has been instantiated.
+     :raises: `RepositoryNotFound` if a repository directory could not be found.
+     """
+-    template = expand_abbreviations(template, abbreviations)
++    template = expand_template_abbreviations(template, abbreviations)
+ 
+     if is_zip_file(template):
+         unzipped_dir = unzip(
+

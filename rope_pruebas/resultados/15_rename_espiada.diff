@@ -1,0 +1,45 @@
+Renaming <get_file_name> to <get_replay_file_path> - today 18:13:55 :
+
+
+--- a/cookiecutter/replay.py
++++ b/cookiecutter/replay.py
+@@ -16,7 +16,7 @@
+     from pathlib import Path
+ 
+ 
+-def get_file_name(replay_dir: Path | str, template_name: str) -> str:
++def get_replay_file_path(replay_dir: Path | str, template_name: str) -> str:
+     """Get the name of file."""
+     suffix = '.json' if not template_name.endswith('.json') else ''
+     file_name = f'{template_name}{suffix}'
+@@ -31,7 +31,7 @@
+         msg = 'Context is required to contain a cookiecutter key'
+         raise ValueError(msg)
+ 
+-    replay_file = get_file_name(replay_dir, template_name)
++    replay_file = get_replay_file_path(replay_dir, template_name)
+ 
+     with open(replay_file, 'w', encoding="utf-8") as outfile:
+         json.dump(context, outfile, indent=2)
+@@ -39,7 +39,7 @@
+ 
+ def load(replay_dir: Path | str, template_name: str) -> dict[str, Any]:
+     """Read json data from file."""
+-    replay_file = get_file_name(replay_dir, template_name)
++    replay_file = get_replay_file_path(replay_dir, template_name)
+ 
+     with open(replay_file, encoding="utf-8") as infile:
+         context: dict[str, Any] = json.load(infile)
+
+--- a/tests/replay/test_replay.py
++++ b/tests/replay/test_replay.py
+@@ -11,7 +11,7 @@
+ def test_get_replay_file_name(replay_file_name) -> None:
+     """Make sure that replay.get_file_name generates a valid json file path."""
+     exp_replay_file_path = os.path.join('foo', 'bar.json')
+-    replay_file_path = replay.get_file_name('foo', replay_file_name)
++    replay_file_path = replay.get_replay_file_path('foo', replay_file_name)
+     assert replay_file_path == exp_replay_file_path
+ 
+ 
+

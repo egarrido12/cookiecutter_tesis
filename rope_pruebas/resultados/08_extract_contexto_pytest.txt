@@ -1,0 +1,3631 @@
+...........FF.........................................FFF..F...FFFF..... [ 18%]
+...FFF.F.FF..F........FF.FFFFFFFFFFFFFFFFF.............................. [ 37%]
+.....................................................s.................. [ 56%]
+.................FFFF...............................................sss. [ 75%]
+...........................FFFFFF....................................... [ 93%]
+.......................                                                  [100%]
+=================================== FAILURES ===================================
+___________________ test_main_does_not_invoke_dump_but_load ____________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x104c9baa0>
+
+    def test_main_does_not_invoke_dump_but_load(mocker) -> None:
+        """Test `cookiecutter` calling correct functions on `replay`."""
+        mock_prompt = mocker.patch('cookiecutter.main.prompt_for_config')
+        mock_gen_context = mocker.patch('cookiecutter.main.generate_context')
+        mock_gen_files = mocker.patch('cookiecutter.main.generate_files')
+        mock_replay_dump = mocker.patch('cookiecutter.main.dump')
+        mock_replay_load = mocker.patch('cookiecutter.main.load')
+    
+>       main.cookiecutter('tests/fake-repo-tmpl/', replay=True)
+
+tests/replay/test_replay.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+cookiecutter/main.py:111: in cookiecutter
+    k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+replay = True, context_file = 'tests/fake-repo-tmpl/cookiecutter.json'
+config_dict = {'abbreviations': {'bb': 'https://bitbucket.org/{0}', 'gh': 'https://github.com/{0}.git', 'gl': 'https://gitlab.com/{0...nc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_main_does_not_invoke_dump0/home/.cookiecutter_replay'}
+context_from_replayfile = <MagicMock name='load()' id='4369295424'>
+extra_context = None
+
+    def _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context):
+        if replay:
+            context = generate_context(
+                context_file=context_file,
+                default_context=config_dict['default_context'],
+                extra_context=None,
+            )
+            logger.debug('replayfile context: %s', context_from_replayfile)
+            items_for_prompting = {
+                k: v
+                for k, v in context['cookiecutter'].items()
+                if k not in context_from_replayfile['cookiecutter']
+            }
+            context_for_prompting = {}
+            context_for_prompting['cookiecutter'] = items_for_prompting
+            context = context_from_replayfile
+            logger.debug('prompting context: %s', context_for_prompting)
+        else:
+            context = generate_context(
+                context_file=context_file,
+                default_context=config_dict['default_context'],
+                extra_context=extra_context,
+            )
+            context_for_prompting = context
+>       return k, v, context, context_for_prompting
+               ^
+E       NameError: name 'k' is not defined
+
+cookiecutter/main.py:204: NameError
+___________________ test_main_does_not_invoke_load_but_dump ____________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x104ff4320>
+
+    def test_main_does_not_invoke_load_but_dump(mocker) -> None:
+        """Test `cookiecutter` calling correct functions on non-replay launch."""
+        mock_prompt = mocker.patch('cookiecutter.main.prompt_for_config')
+        mock_gen_context = mocker.patch('cookiecutter.main.generate_context')
+        mock_gen_files = mocker.patch('cookiecutter.main.generate_files')
+        mock_replay_dump = mocker.patch('cookiecutter.main.dump')
+        mock_replay_load = mocker.patch('cookiecutter.main.load')
+    
+>       main.cookiecutter('tests/fake-repo-tmpl/', replay=False)
+
+tests/replay/test_replay.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-tmpl/', checkout = None, no_input = False
+extra_context = None, replay = False, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+_________________ test_cli_error_on_existing_output_directory __________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('make_fake_project_dir', 'remove_fake_project_dir')
+    def test_cli_error_on_existing_output_directory(cli_runner) -> None:
+        """Test cli invocation without `overwrite-if-exists` fail if dir exist."""
+        result = cli_runner('tests/fake-repo-pre/', '--no-input')
+        assert result.exit_code != 0
+        expected_error_msg = 'Error: "fake-project" directory already exists\n'
+>       assert result.output == expected_error_msg
+E       assert '' == 'Error: "fake...eady exists\n'
+E         
+E         - Error: "fake-project" directory already exists
+
+tests/test_cli.py:87: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+___________________________________ test_cli ___________________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli(cli_runner) -> None:
+        """Test cli invocation work without flags if directory not exist."""
+        result = cli_runner('tests/fake-repo-pre/', '--no-input')
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:94: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+_______________________________ test_cli_verbose _______________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli_verbose(cli_runner) -> None:
+        """Test cli invocation display log if called with `verbose` flag."""
+        result = cli_runner('tests/fake-repo-pre/', '--no-input', '-v')
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:104: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+__________________________ test_cli_replay_generated ___________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_tmp_dir')
+    def test_cli_replay_generated(cli_runner) -> None:
+        """Test cli invocation correctly generates a project with replay."""
+        template_path = 'tests/fake-repo-replay/'
+        result = cli_runner(
+            template_path,
+            '--replay-file',
+            'tests/test-replay/valid_replay.json',
+            '-o',
+            'tests/tmp/',
+            '-v',
+        )
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result NameError("name 'k' is not defined")>.exit_code
+
+tests/test_cli.py:176: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-replay/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-replay/cookiecutter.json
+DEBUG    cookiecutter.generate:generate.py:171 Context generated is OrderedDict({'cookiecutter': OrderedDict({'full_name': 'Audrey M. Roy Greenfeld', 'email': 'audreyroygreenfeld@example.com', 'github_username': 'audreyfeldroy', 'project_name': 'Replay Project', 'repo_name': "{{ cookiecutter.project_name|lower|replace(' ', '-') }}", 'description': 'original', 'release_date': '2013-07-28', 'year': '2013', 'version': '0.1'})})
+DEBUG    cookiecutter.main:main.py:187 replayfile context: {'cookiecutter': {'version': '0.1.0', 'email': 'raphael@hackebrot.de', 'full_name': 'Raphael Pierzina', 'github_username': 'hackebrot', 'project_name': 'Replay Project', 'repo_name': 'replay-project', 'release_date': '2013-07-28', 'year': '2013', 'description': 'replayed'}}
+DEBUG    cookiecutter.main:main.py:196 prompting context: {'cookiecutter': {}}
+_______ test_cli_overwrite_if_exists_when_output_dir_does_not_exist[-f] ________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+overwrite_cli_flag = '-f'
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli_overwrite_if_exists_when_output_dir_does_not_exist(
+        cli_runner, overwrite_cli_flag
+    ) -> None:
+        """Test cli invocation with `overwrite-if-exists` and `no-input` flags.
+    
+        Case when output dir not exist.
+        """
+        result = cli_runner('tests/fake-repo-pre/', '--no-input', overwrite_cli_flag)
+    
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:262: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+_ test_cli_overwrite_if_exists_when_output_dir_does_not_exist[--overwrite-if-exists] _
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+overwrite_cli_flag = '--overwrite-if-exists'
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli_overwrite_if_exists_when_output_dir_does_not_exist(
+        cli_runner, overwrite_cli_flag
+    ) -> None:
+        """Test cli invocation with `overwrite-if-exists` and `no-input` flags.
+    
+        Case when output dir not exist.
+        """
+        result = cli_runner('tests/fake-repo-pre/', '--no-input', overwrite_cli_flag)
+    
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:262: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+___________ test_cli_overwrite_if_exists_when_output_dir_exists[-f] ____________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+overwrite_cli_flag = '-f'
+
+    @pytest.mark.usefixtures('make_fake_project_dir', 'remove_fake_project_dir')
+    def test_cli_overwrite_if_exists_when_output_dir_exists(
+        cli_runner, overwrite_cli_flag
+    ) -> None:
+        """Test cli invocation with `overwrite-if-exists` and `no-input` flags.
+    
+        Case when output dir already exist.
+        """
+        result = cli_runner('tests/fake-repo-pre/', '--no-input', overwrite_cli_flag)
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:275: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+__ test_cli_overwrite_if_exists_when_output_dir_exists[--overwrite-if-exists] __
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+overwrite_cli_flag = '--overwrite-if-exists'
+
+    @pytest.mark.usefixtures('make_fake_project_dir', 'remove_fake_project_dir')
+    def test_cli_overwrite_if_exists_when_output_dir_exists(
+        cli_runner, overwrite_cli_flag
+    ) -> None:
+        """Test cli invocation with `overwrite-if-exists` and `no-input` flags.
+    
+        Case when output dir already exist.
+        """
+        result = cli_runner('tests/fake-repo-pre/', '--no-input', overwrite_cli_flag)
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:275: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+______________________ test_echo_undefined_variable_error ______________________
+
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_echo_undefined_variable_e0/output'
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    def test_echo_undefined_variable_error(output_dir, cli_runner) -> None:
+        """Cli invocation return error if variable undefined in template."""
+        template_path = 'tests/undefined-variable/file-name/'
+    
+        result = cli_runner(
+            '--no-input',
+            '--default-config',
+            '--output-dir',
+            output_dir,
+            template_path,
+        )
+    
+        assert result.exit_code == 1
+    
+        error = "Unable to create file '{{cookiecutter.foobar}}'"
+>       assert error in result.output
+E       assert "Unable to create file '{{cookiecutter.foobar}}'" in ''
+E        +  where '' = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.output
+
+tests/test_cli.py:428: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:117 Force ignoring user config with default_config switch.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/undefined-variable/file-name/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/undefined-variable/file-name/cookiecutter.json
+______________________ test_echo_unknown_extension_error _______________________
+
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_echo_unknown_extension_er0/output'
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    def test_echo_unknown_extension_error(output_dir, cli_runner) -> None:
+        """Cli return error if extension incorrectly defined in template."""
+        template_path = 'tests/test-extensions/unknown/'
+    
+        result = cli_runner(
+            '--no-input',
+            '--default-config',
+            '--output-dir',
+            output_dir,
+            template_path,
+        )
+    
+        assert result.exit_code == 1
+    
+>       assert 'Unable to load extension: ' in result.output
+E       assert 'Unable to load extension: ' in ''
+E        +  where '' = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.output
+
+tests/test_cli.py:467: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:117 Force ignoring user config with default_config switch.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/unknown/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/unknown/cookiecutter.json
+_____________________________ test_local_extension _____________________________
+
+tmpdir = local('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_local_extension0')
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    def test_local_extension(tmpdir, cli_runner) -> None:
+        """Test to verify correct work of extension, included in template."""
+        output_dir = str(tmpdir.mkdir('output'))
+        template_path = 'tests/test-extensions/local_extension/'
+    
+        result = cli_runner(
+            '--no-input',
+            '--default-config',
+            '--output-dir',
+            output_dir,
+            template_path,
+        )
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:482: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:117 Force ignoring user config with default_config switch.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/local_extension/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/local_extension/cookiecutter.json
+____________________________ test_cli_extra_context ____________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli_extra_context(cli_runner) -> None:
+        """Cli invocation replace content if called with replacement pairs."""
+        result = cli_runner(
+            'tests/fake-repo-pre/',
+            '--no-input',
+            '-v',
+            'project_name=Awesomez',
+        )
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:507: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+_________________________ test_debug_file_non_verbose __________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+debug_file = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_debug_file_non_verbose0/fake-repo.log')
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_debug_file_non_verbose(cli_runner, debug_file) -> None:
+        """Test cli invocation writes log to `debug-file` if flag enabled.
+    
+        Case for normal log output.
+        """
+        assert not debug_file.exists()
+    
+        result = cli_runner(
+            '--no-input',
+            '--debug-file',
+            str(debug_file),
+            'tests/fake-repo-pre/',
+        )
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:547: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+___________________________ test_debug_file_verbose ____________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+debug_file = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_debug_file_verbose0/fake-repo.log')
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_debug_file_verbose(cli_runner, debug_file) -> None:
+        """Test cli invocation writes log to `debug-file` if flag enabled.
+    
+        Case for verbose log output.
+        """
+        assert not debug_file.exists()
+    
+        result = cli_runner(
+            '--verbose',
+            '--no-input',
+            '--debug-file',
+            str(debug_file),
+            'tests/fake-repo-pre/',
+        )
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:574: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+_____________________________ test_directory_repo ______________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_directory_repo(cli_runner) -> None:
+        """Test cli invocation works with `directory` option."""
+        result = cli_runner(
+            'tests/fake-repo-dir/',
+            '--no-input',
+            '-v',
+            '--directory=my-dir',
+        )
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:632: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-dir/my-dir/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-dir/my-dir/cookiecutter.json
+______________________ test_cli_with_json_decoding_error _______________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli_with_json_decoding_error(cli_runner) -> None:
+        """Test cli invocation with a malformed JSON file."""
+        template_path = 'tests/fake-repo-bad-json/'
+        result = cli_runner(template_path, '--no-input')
+        assert result.exit_code != 0
+    
+        # Validate the error message.
+        # original message from json module should be included
+        pattern = 'Expecting \'{0,1}:\'{0,1} delimiter: line 1 column (19|20) \\(char 19\\)'
+>       assert re.search(pattern, result.output)
+E       assert None
+E        +  where None = <function search at 0x1035a8e00>("Expecting '{0,1}:'{0,1} delimiter: line 1 column (19|20) \\(char 19\\)", '')
+E        +    where <function search at 0x1035a8e00> = re.search
+E        +    and   '' = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.output
+
+tests/test_cli.py:695: AssertionError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-bad-json/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-bad-json/cookiecutter.json
+________________________ test_cli_with_pre_prompt_hook _________________________
+
+cli_runner = <function cli_runner.<locals>.cli_main at 0x105424360>
+
+    @pytest.mark.usefixtures('remove_fake_project_dir')
+    def test_cli_with_pre_prompt_hook(cli_runner) -> None:
+        """Test cli invocation in a template with pre_prompt hook."""
+        template_path = 'tests/test-pyhooks/'
+        result = cli_runner(template_path, '--no-input')
+>       assert result.exit_code == 0
+E       assert 1 == 0
+E        +  where 1 = <Result UnboundLocalError("cannot access local variable 'context_from_replayfile' where it is not associated with a value")>.exit_code
+
+tests/test_cli.py:709: AssertionError
+----------------------------- Captured stdout call -----------------------------
+All good here, created /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/cookiecutterwpky949e/test-pyhooks/_cookiecutter.json
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-pyhooks/hooks
+DEBUG    cookiecutter.utils:utils.py:97 Copying repo_dir from /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-pyhooks to /var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/cookiecutterwpky949e/test-pyhooks
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/cookiecutterwpky949e/test-pyhooks/hooks
+DEBUG    cookiecutter.main:main.py:109 context_file is /var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/cookiecutterwpky949e/test-pyhooks/cookiecutter.json
+___________________________ test_should_invoke_main ____________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10543e960>
+project_dir = 'fake-project-templated'
+
+    @pytest.mark.usefixtures('clean_system')
+    def test_should_invoke_main(monkeypatch, project_dir) -> None:
+        """Should create a project and exit with 0 code on cli invocation."""
+        monkeypatch.setenv('PYTHONPATH', '.')
+    
+>       exit_code = subprocess.check_call(
+            [
+                sys.executable,
+                '-m',
+                'cookiecutter.cli',
+                'tests/fake-repo-tmpl',
+                '--no-input',
+            ]
+        )
+
+tests/test_cookiecutter_invocation.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+popenargs = (['/Users/estebangarrido10/cookiecutter_tesis/.venv/bin/python', '-m', 'cookiecutter.cli', 'tests/fake-repo-tmpl', '--no-input'],)
+kwargs = {}, retcode = 1
+cmd = ['/Users/estebangarrido10/cookiecutter_tesis/.venv/bin/python', '-m', 'cookiecutter.cli', 'tests/fake-repo-tmpl', '--no-input']
+
+    def check_call(*popenargs, **kwargs):
+        """Run command with arguments.  Wait for command to complete.  If
+        the exit code was zero then return, otherwise raise
+        CalledProcessError.  The CalledProcessError object will have the
+        return code in the returncode attribute.
+    
+        The arguments are the same as for the call function.  Example:
+    
+        check_call(["ls", "-l"])
+        """
+        retcode = call(*popenargs, **kwargs)
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+>           raise CalledProcessError(retcode, cmd)
+E           subprocess.CalledProcessError: Command '['/Users/estebangarrido10/cookiecutter_tesis/.venv/bin/python', '-m', 'cookiecutter.cli', 'tests/fake-repo-tmpl', '--no-input']' returned non-zero exit status 1.
+
+../../../../.local/share/uv/python/cpython-3.12.15-macos-aarch64-none/lib/python3.12/subprocess.py:413: CalledProcessError
+----------------------------- Captured stderr call -----------------------------
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/cli.py", line 258, in <module>
+    main()
+  File "/Users/estebangarrido10/cookiecutter_tesis/.venv/lib/python3.12/site-packages/click/core.py", line 1442, in __call__
+    return self.main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/estebangarrido10/cookiecutter_tesis/.venv/lib/python3.12/site-packages/click/core.py", line 1363, in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+  File "/Users/estebangarrido10/cookiecutter_tesis/.venv/lib/python3.12/site-packages/click/core.py", line 1226, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/estebangarrido10/cookiecutter_tesis/.venv/lib/python3.12/site-packages/click/core.py", line 794, in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/cli.py", line 219, in main
+    cookiecutter(
+  File "/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py", line 111, in cookiecutter
+    k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+_____ test_cookiecutter_no_input_return_project_dir[tests/fake-repo-pre/] ______
+
+path = 'tests/fake-repo-pre/'
+
+    @pytest.mark.parametrize('path', ['tests/fake-repo-pre/', 'tests/fake-repo-pre'])
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_no_input_return_project_dir(path) -> None:
+        """Verify `cookiecutter` create project dir on input with or without slash."""
+>       project_dir = main.cookiecutter(path, no_input=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_cookiecutter_local_no_input.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-pre/', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+______ test_cookiecutter_no_input_return_project_dir[tests/fake-repo-pre] ______
+
+path = 'tests/fake-repo-pre'
+
+    @pytest.mark.parametrize('path', ['tests/fake-repo-pre/', 'tests/fake-repo-pre'])
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_no_input_return_project_dir(path) -> None:
+        """Verify `cookiecutter` create project dir on input with or without slash."""
+>       project_dir = main.cookiecutter(path, no_input=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_cookiecutter_local_no_input.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-pre', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+___________________ test_cookiecutter_no_input_extra_context ___________________
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_no_input_extra_context() -> None:
+        """Verify `cookiecutter` accept `extra_context` argument."""
+>       main.cookiecutter(
+            'tests/fake-repo-pre',
+            no_input=True,
+            extra_context={'repo_name': 'fake-project-extra'},
+        )
+
+tests/test_cookiecutter_local_no_input.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-pre', checkout = None, no_input = True
+extra_context = {'repo_name': 'fake-project-extra'}, replay = None
+overwrite_if_exists = False, output_dir = '.', config_file = None
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+_____________________ test_cookiecutter_templated_context ______________________
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_templated_context() -> None:
+        """Verify Jinja2 templating correctly works in `cookiecutter.json` file."""
+>       main.cookiecutter('tests/fake-repo-tmpl', no_input=True)
+
+tests/test_cookiecutter_local_no_input.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-tmpl', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-tmpl/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-tmpl/cookiecutter.json
+_______________ test_cookiecutter_no_input_return_rendered_file ________________
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_no_input_return_rendered_file() -> None:
+        """Verify Jinja2 templating correctly works in `cookiecutter.json` file."""
+>       project_dir = main.cookiecutter('tests/fake-repo-pre', no_input=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_cookiecutter_local_no_input.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-pre', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+___________________ test_cookiecutter_dict_values_in_context ___________________
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_dict_values_in_context() -> None:
+        """Verify configured dictionary from `cookiecutter.json` correctly unpacked."""
+>       project_dir = main.cookiecutter('tests/fake-repo-dict', no_input=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_cookiecutter_local_no_input.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-dict', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-dict/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-dict/cookiecutter.json
+______________________ test_cookiecutter_template_cleanup ______________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10544a900>
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_template_cleanup(mocker) -> None:
+        """Verify temporary folder for zip unpacking dropped."""
+        mocker.patch('tempfile.mkdtemp', return_value='fake-tmp', autospec=True)
+    
+        mocker.patch(
+            'cookiecutter.prompt.prompt_and_delete', return_value=True, autospec=True
+        )
+    
+>       main.cookiecutter('tests/files/fake-repo-tmpl.zip', no_input=True)
+
+tests/test_cookiecutter_local_no_input.py:133: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/files/fake-repo-tmpl.zip', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.utils:utils.py:48 Making sure path exists (creates tree if not exist): /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_cookiecutter_template_cle0/home/.cookiecutters
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/fake-tmp/fake-repo-tmpl/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is fake-tmp/fake-repo-tmpl/cookiecutter.json
+______________________ test_cookiecutter_local_with_input ______________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10544a0c0>
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_local_with_input(monkeypatch) -> None:
+        """Verify simple cookiecutter run results, without extra_context provided."""
+        monkeypatch.setattr(
+            'cookiecutter.prompt.read_user_variable',
+            lambda _var, default, _prompts, _prefix: default,
+        )
+>       main.cookiecutter('tests/fake-repo-pre/', no_input=False)
+
+tests/test_cookiecutter_local_with_input.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-pre/', checkout = None, no_input = False
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '.', config_file = None, default_config = False, password = None
+directory = None, skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+____________________ test_cookiecutter_input_extra_context _____________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10543f080>
+
+    @pytest.mark.usefixtures('clean_system', 'remove_additional_dirs')
+    def test_cookiecutter_input_extra_context(monkeypatch) -> None:
+        """Verify simple cookiecutter run results, with extra_context provided."""
+        monkeypatch.setattr(
+            'cookiecutter.prompt.read_user_variable',
+            lambda _var, default, _prompts, _prefix: default,
+        )
+>       main.cookiecutter(
+            'tests/fake-repo-pre',
+            no_input=False,
+            extra_context={'repo_name': 'fake-project-input-extra'},
+        )
+
+tests/test_cookiecutter_local_with_input.py:42: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/fake-repo-pre', checkout = None, no_input = False
+extra_context = {'repo_name': 'fake-project-input-extra'}, replay = None
+overwrite_if_exists = False, output_dir = '.', config_file = None
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-pre/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/fake-repo-pre/cookiecutter.json
+____ test_cookiecutter_nested_templates[fake-nested-templates-fake-project] ____
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10544b260>
+template_dir = 'fake-nested-templates', output_dir = 'fake-project'
+
+    @pytest.mark.parametrize(
+        "template_dir,output_dir",
+        [
+            ["fake-nested-templates", "fake-project"],
+            ["fake-nested-templates-old-style", "fake-package"],
+        ],
+    )
+    def test_cookiecutter_nested_templates(
+        mocker, template_dir: str, output_dir: str
+    ) -> None:
+        """Verify cookiecutter nested configuration files mechanism."""
+        mock_generate_files = mocker.patch("cookiecutter.main.generate_files")
+        main_dir = (Path("tests") / template_dir).resolve()
+>       main.cookiecutter(f"{main_dir}", no_input=True)
+
+tests/test_cookiecutter_nested_templates.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-nested-templates'
+checkout = None, no_input = True, extra_context = None, replay = None
+overwrite_if_exists = False, output_dir = '.', config_file = None
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-nested-templates/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-nested-templates/cookiecutter.json
+_ test_cookiecutter_nested_templates[fake-nested-templates-old-style-fake-package] _
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x105478470>
+template_dir = 'fake-nested-templates-old-style', output_dir = 'fake-package'
+
+    @pytest.mark.parametrize(
+        "template_dir,output_dir",
+        [
+            ["fake-nested-templates", "fake-project"],
+            ["fake-nested-templates-old-style", "fake-package"],
+        ],
+    )
+    def test_cookiecutter_nested_templates(
+        mocker, template_dir: str, output_dir: str
+    ) -> None:
+        """Verify cookiecutter nested configuration files mechanism."""
+        mock_generate_files = mocker.patch("cookiecutter.main.generate_files")
+        main_dir = (Path("tests") / template_dir).resolve()
+>       main.cookiecutter(f"{main_dir}", no_input=True)
+
+tests/test_cookiecutter_nested_templates.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = '/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-nested-templates-old-style'
+checkout = None, no_input = True, extra_context = None, replay = None
+overwrite_if_exists = False, output_dir = '.', config_file = None
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-nested-templates-old-style/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-nested-templates-old-style/cookiecutter.json
+____________________ test_hook_with_extension[pre_gen_hook] ____________________
+
+template = 'tests/test-extensions/custom-extension-pre'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_hook_with_extension_pre_g0/output'
+
+    def test_hook_with_extension(template, output_dir) -> None:
+        """Verify custom Jinja2 extension correctly work in hooks and file rendering.
+    
+        Each file in hooks has simple tests inside and will raise error if not
+        correctly rendered.
+        """
+>       project_dir = main.cookiecutter(
+            template,
+            no_input=True,
+            output_dir=output_dir,
+            extra_context={'project_slug': 'foobar', 'name': 'Cookiemonster'},
+        )
+
+tests/test_custom_extensions_in_hooks.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-extensions/custom-extension-pre', checkout = None
+no_input = True
+extra_context = {'name': 'Cookiemonster', 'project_slug': 'foobar'}
+replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_hook_with_extension_pre_g0/output'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/custom-extension-pre/hooks
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/custom-extension-pre/cookiecutter.json
+___________________ test_hook_with_extension[post_gen_hook] ____________________
+
+template = 'tests/test-extensions/custom-extension-post'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_hook_with_extension_post_0/output'
+
+    def test_hook_with_extension(template, output_dir) -> None:
+        """Verify custom Jinja2 extension correctly work in hooks and file rendering.
+    
+        Each file in hooks has simple tests inside and will raise error if not
+        correctly rendered.
+        """
+>       project_dir = main.cookiecutter(
+            template,
+            no_input=True,
+            output_dir=output_dir,
+            extra_context={'project_slug': 'foobar', 'name': 'Cookiemonster'},
+        )
+
+tests/test_custom_extensions_in_hooks.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-extensions/custom-extension-post', checkout = None
+no_input = True
+extra_context = {'name': 'Cookiemonster', 'project_slug': 'foobar'}
+replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_hook_with_extension_post_0/output'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/custom-extension-post/hooks
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/custom-extension-post/cookiecutter.json
+__________________________ test_jinja2_time_extension __________________________
+
+tmp_path = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_jinja2_time_extension0')
+
+    def test_jinja2_time_extension(tmp_path) -> None:
+        """Verify Jinja2 time extension work correctly."""
+>       project_dir = cookiecutter(
+            'tests/test-extensions/default/', no_input=True, output_dir=str(tmp_path)
+        )
+
+tests/test_default_extensions.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-extensions/default/', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_jinja2_time_extension0'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/default/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/default/cookiecutter.json
+________________________ test_jinja2_slugify_extension _________________________
+
+tmp_path = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_jinja2_slugify_extension0')
+
+    def test_jinja2_slugify_extension(tmp_path) -> None:
+        """Verify Jinja2 slugify extension work correctly."""
+>       project_dir = cookiecutter(
+            'tests/test-extensions/default/', no_input=True, output_dir=str(tmp_path)
+        )
+
+tests/test_default_extensions.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-extensions/default/', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_jinja2_slugify_extension0'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/default/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/default/cookiecutter.json
+__________________________ test_jinja2_uuid_extension __________________________
+
+tmp_path = PosixPath('/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_jinja2_uuid_extension0')
+
+    def test_jinja2_uuid_extension(tmp_path) -> None:
+        """Verify Jinja2 uuid extension work correctly."""
+>       project_dir = cookiecutter(
+            'tests/test-extensions/default/', no_input=True, output_dir=str(tmp_path)
+        )
+
+tests/test_default_extensions.py:56: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-extensions/default/', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_jinja2_uuid_extension0'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-extensions/default/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-extensions/default/cookiecutter.json
+________ test_original_cookiecutter_options_preserved_in__cookiecutter _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10543f5f0>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x10543ede0>
+user_config_file = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config'
+
+    def test_original_cookiecutter_options_preserved_in__cookiecutter(
+        monkeypatch,
+        mocker,
+        user_config_file,
+    ) -> None:
+        """Preserve original context options.
+    
+        Tests you can access the original context options via
+        `context['_cookiecutter']`.
+        """
+        monkeypatch.chdir('tests/fake-repo-tmpl-_cookiecutter')
+        mock_generate_files = mocker.patch('cookiecutter.main.generate_files')
+>       cookiecutter(
+            '.',
+            no_input=True,
+            replay=False,
+            config_file=user_config_file,
+        )
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test_main.py:18: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = '.', checkout = None, no_input = True, extra_context = None
+replay = False, overwrite_if_exists = False, output_dir = '.'
+config_file = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config'
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:122 Loading custom config from /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config.
+DEBUG    cookiecutter.config:config.py:67 config_path is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-tmpl-_cookiecutter/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is ./cookiecutter.json
+________________________ test_replay_dump_template_name ________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x105542300>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x105541f70>
+user_config_data = {'cookiecutters_dir': '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/u...te/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/cookiecutter_replay'}
+user_config_file = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config'
+
+    def test_replay_dump_template_name(
+        monkeypatch, mocker, user_config_data, user_config_file
+    ) -> None:
+        """Check that replay_dump is called with a valid template_name.
+    
+        Template name must not be a relative path.
+    
+        Otherwise files such as ``..json`` are created, which are not just cryptic
+        but also later mistaken for replay files of other templates if invoked with
+        '.' and '--replay'.
+    
+        Change the current working directory temporarily to 'tests/fake-repo-tmpl'
+        for this test and call cookiecutter with '.' for the target template.
+        """
+        monkeypatch.chdir('tests/fake-repo-tmpl')
+    
+        mock_replay_dump = mocker.patch('cookiecutter.main.dump')
+        mocker.patch('cookiecutter.main.generate_files')
+    
+>       cookiecutter(
+            '.',
+            no_input=True,
+            replay=False,
+            config_file=user_config_file,
+        )
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test_main.py:51: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = '.', checkout = None, no_input = True, extra_context = None
+replay = False, overwrite_if_exists = False, output_dir = '.'
+config_file = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config'
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:122 Loading custom config from /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config.
+DEBUG    cookiecutter.config:config.py:67 config_path is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-tmpl/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is ./cookiecutter.json
+________________________ test_replay_load_template_name ________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1056f9c10>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x1056fa7b0>
+user_config_data = {'cookiecutters_dir': '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/u...te/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/cookiecutter_replay'}
+user_config_file = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config'
+
+    def test_replay_load_template_name(
+        monkeypatch, mocker, user_config_data, user_config_file
+    ) -> None:
+        """Check that replay_load is called correctly.
+    
+        Calls require valid template_name that is not a relative path.
+    
+        Change the current working directory temporarily to 'tests/fake-repo-tmpl'
+        for this test and call cookiecutter with '.' for the target template.
+        """
+        monkeypatch.chdir('tests/fake-repo-tmpl')
+    
+        mock_replay_load = mocker.patch('cookiecutter.main.load')
+        mocker.patch('cookiecutter.main.generate_context').return_value = {
+            'cookiecutter': {}
+        }
+        mocker.patch('cookiecutter.main.generate_files')
+        mocker.patch('cookiecutter.main.dump')
+    
+>       cookiecutter(
+            '.',
+            replay=True,
+            config_file=user_config_file,
+        )
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test_main.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py:111: in cookiecutter
+    k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+replay = True, context_file = './cookiecutter.json'
+config_dict = {'abbreviations': {'bb': 'https://bitbucket.org/{0}', 'gh': 'https://github.com/{0}.git', 'gl': 'https://gitlab.com/{0...te/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/cookiecutter_replay'}
+context_from_replayfile = <MagicMock name='load()' id='4386425696'>
+extra_context = None
+
+    def _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context):
+        if replay:
+            context = generate_context(
+                context_file=context_file,
+                default_context=config_dict['default_context'],
+                extra_context=None,
+            )
+            logger.debug('replayfile context: %s', context_from_replayfile)
+            items_for_prompting = {
+                k: v
+                for k, v in context['cookiecutter'].items()
+                if k not in context_from_replayfile['cookiecutter']
+            }
+            context_for_prompting = {}
+            context_for_prompting['cookiecutter'] = items_for_prompting
+            context = context_from_replayfile
+            logger.debug('prompting context: %s', context_for_prompting)
+        else:
+            context = generate_context(
+                context_file=context_file,
+                default_context=config_dict['default_context'],
+                extra_context=extra_context,
+            )
+            context_for_prompting = context
+>       return k, v, context, context_for_prompting
+               ^
+E       NameError: name 'k' is not defined
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py:204: NameError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:122 Loading custom config from /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config.
+DEBUG    cookiecutter.config:config.py:67 config_path is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-tmpl/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is ./cookiecutter.json
+DEBUG    cookiecutter.main:main.py:187 replayfile context: <MagicMock name='load()' id='4386425696'>
+DEBUG    cookiecutter.main:main.py:196 prompting context: {'cookiecutter': {}}
+___________________________ test_custom_replay_file ____________________________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1057386e0>
+mocker = <pytest_mock.plugin.MockerFixture object at 0x105739850>
+user_config_file = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config'
+
+    def test_custom_replay_file(monkeypatch, mocker, user_config_file) -> None:
+        """Check that reply.load is called with the custom replay_file."""
+        monkeypatch.chdir('tests/fake-repo-tmpl')
+    
+        mock_replay_load = mocker.patch('cookiecutter.main.load')
+        mocker.patch('cookiecutter.main.generate_context').return_value = {
+            'cookiecutter': {}
+        }
+        mocker.patch('cookiecutter.main.generate_files')
+        mocker.patch('cookiecutter.main.dump')
+    
+>       cookiecutter(
+            '.',
+            replay='./custom-replay-file',
+            config_file=user_config_file,
+        )
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test_main.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py:111: in cookiecutter
+    k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+replay = './custom-replay-file', context_file = './cookiecutter.json'
+config_dict = {'abbreviations': {'bb': 'https://bitbucket.org/{0}', 'gh': 'https://github.com/{0}.git', 'gl': 'https://gitlab.com/{0...te/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/cookiecutter_replay'}
+context_from_replayfile = <MagicMock name='load()' id='4386499632'>
+extra_context = None
+
+    def _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context):
+        if replay:
+            context = generate_context(
+                context_file=context_file,
+                default_context=config_dict['default_context'],
+                extra_context=None,
+            )
+            logger.debug('replayfile context: %s', context_from_replayfile)
+            items_for_prompting = {
+                k: v
+                for k, v in context['cookiecutter'].items()
+                if k not in context_from_replayfile['cookiecutter']
+            }
+            context_for_prompting = {}
+            context_for_prompting['cookiecutter'] = items_for_prompting
+            context = context_from_replayfile
+            logger.debug('prompting context: %s', context_for_prompting)
+        else:
+            context = generate_context(
+                context_file=context_file,
+                default_context=config_dict['default_context'],
+                extra_context=extra_context,
+            )
+            context_for_prompting = context
+>       return k, v, context, context_for_prompting
+               ^
+E       NameError: name 'k' is not defined
+
+/Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/cookiecutter/main.py:204: NameError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:122 Loading custom config from /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config.
+DEBUG    cookiecutter.config:config.py:67 config_path is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/user_dir0/config
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/fake-repo-tmpl/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is ./cookiecutter.json
+DEBUG    cookiecutter.main:main.py:187 replayfile context: <MagicMock name='load()' id='4386499632'>
+DEBUG    cookiecutter.main:main.py:196 prompting context: {'cookiecutter': {}}
+_____________________________ test_api_invocation ______________________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x105548b60>
+template = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_api_invocation0/template'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_api_invocation0/output'
+context = {'cookiecutter': {'email': 'raphael@hackebrot.de', 'full_name': 'Raphael Pierzina', 'github_username': 'hackebrot', 'version': '0.1.0'}}
+
+    def test_api_invocation(mocker, template, output_dir, context) -> None:
+        """Verify output dir location is correctly passed."""
+        mock_gen_files = mocker.patch('cookiecutter.main.generate_files')
+    
+>       main.cookiecutter(template, output_dir=output_dir)
+
+tests/test_specify_output_dir.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_api_invocation0/template'
+checkout = None, no_input = False, extra_context = None, replay = None
+overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_api_invocation0/output'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_api_invocation0/template/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_api_invocation0/template/cookiecutter.json
+___________________________ test_default_output_dir ____________________________
+
+mocker = <pytest_mock.plugin.MockerFixture object at 0x1056f8500>
+template = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_default_output_dir0/template'
+context = {'cookiecutter': {'email': 'raphael@hackebrot.de', 'full_name': 'Raphael Pierzina', 'github_username': 'hackebrot', 'version': '0.1.0'}}
+
+    def test_default_output_dir(mocker, template, context) -> None:
+        """Verify default output dir is current working folder."""
+        mock_gen_files = mocker.patch('cookiecutter.main.generate_files')
+    
+>       main.cookiecutter(template)
+
+tests/test_specify_output_dir.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_default_output_dir0/template'
+checkout = None, no_input = False, extra_context = None, replay = None
+overwrite_if_exists = False, output_dir = '.', config_file = None
+default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_default_output_dir0/template/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is /private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_default_output_dir0/template/cookiecutter.json
+________________________ test_build_templates[include] _________________________
+
+template = 'include'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_include_0/templates'
+
+    @pytest.mark.parametrize("template", ["include", "no-templates", "extends", "super"])
+    def test_build_templates(template, output_dir) -> None:
+        """
+        Verify Templates Design keywords.
+    
+        no-templates is a compatibility tests for repo without `templates` directory
+        """
+>       project_dir = main.cookiecutter(
+            f'tests/test-templates/{template}',
+            no_input=True,
+            output_dir=output_dir,
+        )
+
+tests/test_templates.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-templates/include', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_include_0/templates'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-templates/include/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-templates/include/cookiecutter.json
+______________________ test_build_templates[no-templates] ______________________
+
+template = 'no-templates'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_no_templa0/templates'
+
+    @pytest.mark.parametrize("template", ["include", "no-templates", "extends", "super"])
+    def test_build_templates(template, output_dir) -> None:
+        """
+        Verify Templates Design keywords.
+    
+        no-templates is a compatibility tests for repo without `templates` directory
+        """
+>       project_dir = main.cookiecutter(
+            f'tests/test-templates/{template}',
+            no_input=True,
+            output_dir=output_dir,
+        )
+
+tests/test_templates.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-templates/no-templates', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_no_templa0/templates'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-templates/no-templates/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-templates/no-templates/cookiecutter.json
+________________________ test_build_templates[extends] _________________________
+
+template = 'extends'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_extends_0/templates'
+
+    @pytest.mark.parametrize("template", ["include", "no-templates", "extends", "super"])
+    def test_build_templates(template, output_dir) -> None:
+        """
+        Verify Templates Design keywords.
+    
+        no-templates is a compatibility tests for repo without `templates` directory
+        """
+>       project_dir = main.cookiecutter(
+            f'tests/test-templates/{template}',
+            no_input=True,
+            output_dir=output_dir,
+        )
+
+tests/test_templates.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-templates/extends', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_extends_0/templates'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-templates/extends/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-templates/extends/cookiecutter.json
+_________________________ test_build_templates[super] __________________________
+
+template = 'super'
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_super_0/templates'
+
+    @pytest.mark.parametrize("template", ["include", "no-templates", "extends", "super"])
+    def test_build_templates(template, output_dir) -> None:
+        """
+        Verify Templates Design keywords.
+    
+        no-templates is a compatibility tests for repo without `templates` directory
+        """
+>       project_dir = main.cookiecutter(
+            f'tests/test-templates/{template}',
+            no_input=True,
+            output_dir=output_dir,
+        )
+
+tests/test_templates.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+template = 'tests/test-templates/super', checkout = None, no_input = True
+extra_context = None, replay = None, overwrite_if_exists = False
+output_dir = '/private/var/folders/k_/fsm668d93fnc6932cv0ykpbh0000gn/T/pytest-of-estebangarrido10/pytest-46/test_build_templates_super_0/templates'
+config_file = None, default_config = False, password = None, directory = None
+skip_if_file_exists = False, accept_hooks = True
+keep_project_on_failure = False
+
+    def cookiecutter(
+        template: str,
+        checkout: str | None = None,
+        no_input: bool = False,
+        extra_context: dict[str, Any] | None = None,
+        replay: bool | str | None = None,
+        overwrite_if_exists: bool = False,
+        output_dir: str = '.',
+        config_file: str | None = None,
+        default_config: bool = False,
+        password: str | None = None,
+        directory: str | None = None,
+        skip_if_file_exists: bool = False,
+        accept_hooks: bool = True,
+        keep_project_on_failure: bool = False,
+    ) -> str:
+        """
+        Run Cookiecutter just as if using it from the command line.
+    
+        :param template: A directory containing a project template directory,
+            or a URL to a git repository.
+        :param checkout: The branch, tag or commit ID to checkout after clone.
+        :param no_input: Do not prompt for user input.
+            Use default values for template parameters taken from `cookiecutter.json`, user
+            config and `extra_dict`. Force a refresh of cached resources.
+        :param extra_context: A dictionary of context that overrides default
+            and user configuration.
+        :param replay: Do not prompt for input, instead read from saved json. If
+            ``True`` read from the ``replay_dir``.
+            if it exists
+        :param overwrite_if_exists: Overwrite the contents of the output directory
+            if it exists.
+        :param output_dir: Where to output the generated project dir into.
+        :param config_file: User configuration file path.
+        :param default_config: Use default values rather than a config file.
+        :param password: The password to use when extracting the repository.
+        :param directory: Relative path to a cookiecutter template in a repository.
+        :param skip_if_file_exists: Skip the files in the corresponding directories
+            if they already exist.
+        :param accept_hooks: Accept pre and post hooks if set to `True`.
+        :param keep_project_on_failure: If `True` keep generated project directory even when
+            generation fails
+        """
+        if replay and ((no_input is not False) or (extra_context is not None)):
+            err_msg = (
+                "You can not use both replay and no_input or extra_context "
+                "at the same time."
+            )
+            raise InvalidModeException(err_msg)
+    
+        config_dict = get_user_config(
+            config_file=config_file,
+            default_config=default_config,
+        )
+        base_repo_dir, cleanup_base_repo_dir = determine_repo_dir(
+            template=template,
+            abbreviations=config_dict['abbreviations'],
+            clone_to_dir=config_dict['cookiecutters_dir'],
+            checkout=checkout,
+            no_input=no_input,
+            password=password,
+            directory=directory,
+        )
+        repo_dir, cleanup = base_repo_dir, cleanup_base_repo_dir
+        # Run pre_prompt hook
+        repo_dir = str(run_pre_prompt_hook(base_repo_dir)) if accept_hooks else repo_dir
+        # Always remove temporary dir if it was created
+        cleanup = repo_dir != base_repo_dir
+    
+        import_patch = _patch_import_path_for_repo(repo_dir)
+        template_name = os.path.basename(os.path.abspath(repo_dir))
+        if replay:
+            with import_patch:
+                if isinstance(replay, bool):
+                    context_from_replayfile = load(config_dict['replay_dir'], template_name)
+                else:
+                    path, template_name = os.path.split(os.path.splitext(replay)[0])
+                    context_from_replayfile = load(path, template_name)
+    
+        context_file = os.path.join(repo_dir, 'cookiecutter.json')
+        logger.debug('context_file is %s', context_file)
+    
+>       k, v, context, context_for_prompting = _build_context(replay, context_file, config_dict, context_from_replayfile, extra_context)
+                                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       UnboundLocalError: cannot access local variable 'context_from_replayfile' where it is not associated with a value
+
+cookiecutter/main.py:111: UnboundLocalError
+------------------------------ Captured log call -------------------------------
+DEBUG    cookiecutter.config:config.py:134 User config not found. Loading default config.
+DEBUG    cookiecutter.hooks:hooks.py:63 hooks_dir is /Users/estebangarrido10/cookiecutter_tesis/rope_pruebas/_trabajo/08_extract_contexto/tests/test-templates/super/hooks
+DEBUG    cookiecutter.hooks:hooks.py:66 No hooks/dir in template_dir
+DEBUG    cookiecutter.main:main.py:109 context_file is tests/test-templates/super/cookiecutter.json
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_generate_hooks.py:195: Win only test
+SKIPPED [3] tests/test_prompt.py:640: Win only test
+46 failed, 333 passed, 4 skipped in 2.22s

@@ -1,0 +1,108 @@
+Renaming <create_env_with_context> to <create_jinja_env> - today 18:13:21 :
+
+
+--- a/cookiecutter/generate.py
++++ b/cookiecutter/generate.py
+@@ -27,7 +27,7 @@
+ from cookiecutter.hooks import run_hook_from_repo_dir
+ from cookiecutter.prompt import YesNoPrompt
+ from cookiecutter.utils import (
+-    create_env_with_context,
++    create_jinja_env,
+     make_sure_path_exists,
+     rmtree,
+     work_in,
+@@ -348,7 +348,7 @@
+     """
+     context = context or OrderedDict([])
+ 
+-    env = create_env_with_context(context)
++    env = create_jinja_env(context)
+ 
+     template_dir = find_template(repo_dir, env)
+     logger.debug('Generating project from %s...', template_dir)
+
+--- a/tests/test_find.py
++++ b/tests/test_find.py
+@@ -7,7 +7,7 @@
+ 
+ from cookiecutter import find
+ from cookiecutter.exceptions import NonTemplatedInputDirException
+-from cookiecutter.utils import create_env_with_context
++from cookiecutter.utils import create_jinja_env
+ 
+ 
+ @pytest.fixture(params=['fake-repo-pre', 'fake-repo-pre2'])
+@@ -19,7 +19,7 @@
+ @pytest.fixture()
+ def env(context):
+     """Fixture return the env generated from context."""
+-    return create_env_with_context(context)
++    return create_jinja_env(context)
+ 
+ 
+ @pytest.mark.parametrize(
+
+--- a/cookiecutter/utils.py
++++ b/cookiecutter/utils.py
+@@ -99,7 +99,7 @@
+     return Path(new_dir)
+ 
+ 
+-def create_env_with_context(context: dict[str, Any]) -> StrictEnvironment:
++def create_jinja_env(context: dict[str, Any]) -> StrictEnvironment:
+     """Create a jinja environment using the provided context."""
+     envvars = context.get('cookiecutter', {}).get('_jinja2_env_vars', {})
+ 
+
+--- a/cookiecutter/hooks.py
++++ b/cookiecutter/hooks.py
+@@ -16,7 +16,7 @@
+ from cookiecutter import utils
+ from cookiecutter.exceptions import FailedHookException
+ from cookiecutter.utils import (
+-    create_env_with_context,
++    create_jinja_env,
+     create_tmp_repo_dir,
+     rmtree,
+     work_in,
+@@ -119,7 +119,7 @@
+     contents = Path(script_path).read_text(encoding='utf-8')
+ 
+     with tempfile.NamedTemporaryFile(delete=False, mode='wb', suffix=extension) as temp:
+-        env = create_env_with_context(context)
++        env = create_jinja_env(context)
+         template = env.from_string(contents)
+         output = template.render(**context)
+         temp.write(output.encode('utf-8'))
+
+--- a/cookiecutter/prompt.py
++++ b/cookiecutter/prompt.py
+@@ -16,7 +16,7 @@
+ from rich.prompt import Confirm, InvalidResponse, Prompt, PromptBase
+ 
+ from cookiecutter.exceptions import UndefinedVariableInTemplate
+-from cookiecutter.utils import create_env_with_context, rmtree
++from cookiecutter.utils import create_jinja_env, rmtree
+ 
+ if TYPE_CHECKING:
+     from jinja2 import Environment
+@@ -290,7 +290,7 @@
+     :param no_input: Do not prompt for user input and use only values from context.
+     """
+     cookiecutter_dict = OrderedDict([])
+-    env = create_env_with_context(context)
++    env = create_jinja_env(context)
+     prompts = context['cookiecutter'].pop('__prompts__', {})
+ 
+     # First pass: Handle simple and raw variables, plus choices.
+@@ -374,7 +374,7 @@
+     :returns: Path to the selected template.
+     """
+     cookiecutter_dict: OrderedDict[str, Any] = OrderedDict([])
+-    env = create_env_with_context(context)
++    env = create_jinja_env(context)
+     prefix = ""
+     prompts = context['cookiecutter'].pop('__prompts__', {})
+     key = "templates"
+

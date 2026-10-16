@@ -1,0 +1,44 @@
+Extract method <_copy_dirs_without_rendering> - today 18:13:41 :
+
+
+--- a/cookiecutter/generate.py
++++ b/cookiecutter/generate.py
+@@ -403,18 +403,7 @@
+                 else:
+                     render_dirs.append(d)
+ 
+-            for copy_dir in copy_dirs:
+-                indir = os.path.normpath(os.path.join(root, copy_dir))
+-                outdir = os.path.normpath(os.path.join(project_dir, indir))
+-                outdir = env.from_string(outdir).render(**context)
+-                logger.debug('Copying dir %s to %s without rendering', indir, outdir)
+-
+-                # The outdir is not the root dir, it is the dir which marked as copy
+-                # only in the config file. If the program hits this line, which means
+-                # the overwrite_if_exists = True, and root dir exists
+-                if os.path.isdir(outdir):
+-                    shutil.rmtree(outdir)
+-                shutil.copytree(indir, outdir)
++            _copy_dirs_without_rendering(copy_dirs, root, project_dir, env, context)
+ 
+             # We mutate ``dirs``, because we only want to go through these dirs
+             # recursively
+@@ -464,3 +453,17 @@
+         )
+ 
+     return project_dir
++
++def _copy_dirs_without_rendering(copy_dirs, root, project_dir, env, context):
++    for copy_dir in copy_dirs:
++        indir = os.path.normpath(os.path.join(root, copy_dir))
++        outdir = os.path.normpath(os.path.join(project_dir, indir))
++        outdir = env.from_string(outdir).render(**context)
++        logger.debug('Copying dir %s to %s without rendering', indir, outdir)
++
++        # The outdir is not the root dir, it is the dir which marked as copy
++        # only in the config file. If the program hits this line, which means
++        # the overwrite_if_exists = True, and root dir exists
++        if os.path.isdir(outdir):
++            shutil.rmtree(outdir)
++        shutil.copytree(indir, outdir)
+
